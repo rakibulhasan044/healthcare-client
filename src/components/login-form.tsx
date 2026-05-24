@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useActionState } from "react";
@@ -8,6 +9,15 @@ import { loginUser } from "@/services/auth/loginUser";
 
 const LoginForm = () => {
   const [state, formAction, isPending] = useActionState(loginUser, null);
+
+  const getFieldError = (fieldName: string) => {
+    if (state && state.errors) {
+      const error = state.errors.find((err: any) => err.field === fieldName);
+      return error?.message;
+    } else {
+      return null;
+    }
+  };
   console.log(state);
   return (
     <form action={formAction}>
@@ -21,10 +31,21 @@ const LoginForm = () => {
             placeholder="exampl@gmail.com"
             required
           />
+          {getFieldError("email") && (
+            <FieldDescription className="text-red-600">
+              {getFieldError("email")}
+            </FieldDescription>
+          )}
         </Field>
+
         <Field>
           <FieldLabel htmlFor="password">Password</FieldLabel>
           <Input id="password" name="password" type="password" required />
+          {getFieldError("password") && (
+            <FieldDescription className="text-red-600">
+              {getFieldError("password")}
+            </FieldDescription>
+          )}
         </Field>
         <FieldGroup className="mt-4">
           <Field>
@@ -34,8 +55,9 @@ const LoginForm = () => {
               disabled={isPending}
               className="bg-blue-600 text-white font-bold"
             >
-              {isPending? "Logging in ...": "Login"}
+              {isPending ? "Logging in ..." : "Login"}
             </Button>
+
             <FieldDescription className="px-6 text-center">
               Do not have an account?{" "}
               <a href="/register" className="text-blue-600 hover:underline">

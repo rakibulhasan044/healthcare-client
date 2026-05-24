@@ -9,20 +9,17 @@ import { Input } from "./ui/input";
 
 const RegisterForm = () => {
   const [state, formAction, isPending] = useActionState(registerPatient, null);
-  console.log(state, "state");
 
   const getFieldError = (fieldName: string) => {
     if (state && state.errors) {
       const error = state.errors.find((err: any) => err.field === fieldName);
-      if (error) {
-        return error.message;
-      } else {
-        return null;
-      }
+      return error?.message;
     } else {
       return null;
     }
   };
+
+  console.log(state, "state");
   return (
     <form action={formAction}>
       <FieldGroup>
@@ -46,7 +43,6 @@ const RegisterForm = () => {
               type="text"
               placeholder="123 Main St"
             />
-
             {getFieldError("address") && (
               <FieldDescription className="text-red-600">
                 {getFieldError("address")}
@@ -78,6 +74,11 @@ const RegisterForm = () => {
               type="text"
               placeholder="0123456789"
             />
+            {getFieldError("contactNumber") && (
+              <FieldDescription className="text-red-600">
+                {getFieldError("contactNumber")}
+              </FieldDescription>
+            )}
           </Field>
           {/* Password */}
           <Field>
