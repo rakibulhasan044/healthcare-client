@@ -1,12 +1,16 @@
 "use client";
 
+import { useActionState } from "react";
 import { Button } from "./ui/button";
 import { Field, FieldDescription, FieldGroup, FieldLabel } from "./ui/field";
 import { Input } from "./ui/input";
+import { loginUser } from "@/services/auth/loginUser";
 
 const LoginForm = () => {
+  const [state, formAction, isPending] = useActionState(loginUser, null);
+  console.log(state);
   return (
-    <form>
+    <form action={formAction}>
       <FieldGroup>
         <Field>
           <FieldLabel htmlFor="email">Email</FieldLabel>
@@ -25,10 +29,12 @@ const LoginForm = () => {
         <FieldGroup className="mt-4">
           <Field>
             <Button
+              type="submit"
               variant="outline"
+              disabled={isPending}
               className="bg-blue-600 text-white font-bold"
             >
-              Submit
+              {isPending? "Logging in ...": "Login"}
             </Button>
             <FieldDescription className="px-6 text-center">
               Do not have an account?{" "}

@@ -1,10 +1,6 @@
 import Link from "next/link";
 import { Button } from "../ui/button";
-import {
-  Sheet,
-  SheetContent,
-  SheetTrigger,
-} from "../ui/sheet";
+import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 import { Menu } from "lucide-react";
 
 const navItems = [
@@ -46,9 +42,7 @@ const PublicNavbar = () => {
         <div className="md:hidden">
           <Sheet>
             <SheetTrigger>
-              <Button variant={"outline"}>
-                <Menu />
-              </Button>
+              <Menu />
             </SheetTrigger>
             <SheetContent side="right" className="w-75 sm:w-100 px-4">
               <nav className="">
