@@ -88,10 +88,32 @@ export const loginUser = async (
       throw new Error("Tokens not found in cookies");
     }
 
+    if (!result.success) {
+      return {
+        success: false,
+        error: result.message || "Login failed",
+      };
+    }
+
+    let userRole: UserRole;
+
+    try {
+      const verifiedToken = jwt.verify(
+        accessTokenObject.accessToken,
+        process.env.JWT_SECRET as Secret,
+      ) as JwtPayload;
+      userRole = verifiedToken.role;
+    } catch (error) {
+      return {
+        success: false,
+        error: "Invalid authentication token",
+      };
+    }
+
     await setCookie("accessToken", accessTokenObject.accessToken, {
       secure: true,
       httpOnly: true,
-      maxAge: parseInt(accessTokenObject["Max-Age"]) || 1000 * 60 * 60,
+      maxAge: parseInt(accessTokenObject["Max-Age"]) || 60 * 60,
       path: accessTokenObject.Path || "/",
       sameSite: accessTokenObject["SameSite"] || "none",
     });
@@ -99,26 +121,10 @@ export const loginUser = async (
     await setCookie("refreshToken", refreshTokenObject.refreshToken, {
       secure: true,
       httpOnly: true,
-      maxAge:
-        parseInt(refreshTokenObject["Max-Age"]) || 1000 * 60 * 60 * 24 * 90,
+      maxAge: parseInt(refreshTokenObject["Max-Age"]) || 60 * 60 * 24 * 90,
       path: refreshTokenObject.Path || "/",
       sameSite: refreshTokenObject["SameSite"] || "none",
     });
-
-    const verifiedToken: string | JwtPayload = jwt.verify(
-      accessTokenObject.accessToken,
-      process.env.JWT_SECRET as Secret,
-    );
-
-    if (typeof verifiedToken === "string") {
-      throw new Error("Invalid token");
-    }
-
-    const userRole: UserRole = verifiedToken.role;
-
-    if (!result.success) {
-      throw new Error("Login failed !!");
-    }
 
     if (redirectTo) {
       const requestedPath = redirectTo.toString();

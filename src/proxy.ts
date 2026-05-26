@@ -7,7 +7,6 @@ import {
   isAuthRoutes,
   UserRole,
 } from "./lib/auth-utils";
-import { deleteCookie } from "./services/auth/tokenHandler";
 
 export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
@@ -16,18 +15,26 @@ export async function proxy(request: NextRequest) {
   let userRole: UserRole | null = null;
 
   if (accessToken) {
-    const verifiedToken: string | JwtPayload = jwt.verify(
-      accessToken,
-      process.env.JWT_SECRET as Secret,
-    );
-
-    if (typeof verifiedToken === "string") {
-      await deleteCookie("accessToken");
-      await deleteCookie("refreshToken");
-      return NextResponse.redirect(new URL("/login", request.url));
+    if (!process.env.JWT_SECRET) {
+      throw new Error("JWT_SECRET is not configured");
     }
+    try {
+      const verifiedToken = jwt.verify(
+        accessToken,
+        process.env.JWT_SECRET as Secret,
+      ) as JwtPayload;
 
-    userRole = verifiedToken.role;
+      userRole = verifiedToken.role;
+    } catch (error) {
+      console.error("JWT verification failed:", error);
+
+      const response = NextResponse.redirect(new URL("/login", request.url));
+
+      response.cookies.delete("accessToken");
+      response.cookies.delete("refreshToken");
+
+      return response;
+    }
   }
 
   const routeOwner = getRouteOwner(pathname);

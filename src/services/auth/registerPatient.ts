@@ -88,7 +88,7 @@ export const registerPatient = async (
     console.log(res, "res");
 
     if (result.success) {
-      await loginUser(_currentState, formData);
+      return await loginUser(_currentState, formData);
     }
     return result;
   } catch (error: any) {

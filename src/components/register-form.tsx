@@ -67,7 +67,7 @@ const RegisterForm = () => {
           </Field>
 
           <Field>
-            <FieldLabel htmlFor="contactNumber"></FieldLabel>
+            <FieldLabel htmlFor="contactNumber">Contact Number</FieldLabel>
             <Input
               id="contactNumber"
               name="contactNumber"
