@@ -1,12 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
 
-import { cookies } from "next/headers";
 import z from "zod";
 import { parse } from "cookie";
 import { redirect } from "next/navigation";
 import jwt, { JwtPayload, Secret } from "jsonwebtoken";
-import { getDefaultDashboardRoute, isValidRedirectForRole, UserRole } from "@/lib/auth-utils";
+import {
+  getDefaultDashboardRoute,
+  isValidRedirectForRole,
+  UserRole,
+} from "@/lib/auth-utils";
+import { setCookie } from "./tokenHandler";
 
 const loginValidationZodSchema = z.object({
   email: z.string({ error: "Invalid email address" }),
@@ -57,22 +61,8 @@ export const loginUser = async (
       }),
     });
 
-    // const cookieStore = await cookies();
-    // const rawCookies = response.headers.getSetCookie();
-    // const parsedCookies = setCookieParser.parse(rawCookies);
+    const result = await res.json();
 
-    // for (const cookie of parsedCookies) {
-    //   cookieStore.set({
-    //     name: cookie.name,
-    //     value: cookie.value,
-    //     httpOnly: cookie.httpOnly,
-    //     secure: cookie.secure,
-    //     sameSite: cookie.sameSite as "lax" | "strict" | "none" | undefined,
-    //     path: cookie.path,
-    //     maxAge: cookie.maxAge,
-    //   });
-    // }
-    // return await response.json();
     const setCookieHeaders = res.headers.getSetCookie();
 
     if (setCookieHeaders && setCookieHeaders.length > 0) {
@@ -98,9 +88,7 @@ export const loginUser = async (
       throw new Error("Tokens not found in cookies");
     }
 
-    const cookieStore = await cookies();
-
-    cookieStore.set("accessToken", accessTokenObject.accessToken, {
+    await setCookie("accessToken", accessTokenObject.accessToken, {
       secure: true,
       httpOnly: true,
       maxAge: parseInt(accessTokenObject["Max-Age"]) || 1000 * 60 * 60,
@@ -108,7 +96,7 @@ export const loginUser = async (
       sameSite: accessTokenObject["SameSite"] || "none",
     });
 
-    cookieStore.set("refreshToken", refreshTokenObject.refreshToken, {
+    await setCookie("refreshToken", refreshTokenObject.refreshToken, {
       secure: true,
       httpOnly: true,
       maxAge:
@@ -128,20 +116,20 @@ export const loginUser = async (
 
     const userRole: UserRole = verifiedToken.role;
 
-    if(redirectTo) {
-      const requestedPath = redirectTo.toString()
-      if(isValidRedirectForRole(requestedPath, userRole)){
-        redirect(requestedPath)
-      } else {
-        redirect(getDefaultDashboardRoute(userRole))
-      }
+    if (!result.success) {
+      throw new Error("Login failed !!");
     }
 
-    const redirectPath = redirectTo
-      ? redirectTo.toString()
-      : getDefaultDashboardRoute(userRole);
-
-    redirect(redirectPath);
+    if (redirectTo) {
+      const requestedPath = redirectTo.toString();
+      if (isValidRedirectForRole(requestedPath, userRole)) {
+        redirect(requestedPath);
+      } else {
+        redirect(getDefaultDashboardRoute(userRole));
+      }
+    } else {
+      redirect(getDefaultDashboardRoute(userRole));
+    }
   } catch (error: any) {
     if (error?.digest?.startsWith("NEXT_REDIRECT")) {
       throw error;
