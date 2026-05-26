@@ -1,85 +1,9 @@
 import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import { NextRequest } from "next/server";
 import jwt, { JwtPayload, Secret } from "jsonwebtoken";
 import { cookies } from "next/headers";
+import { getDefaultDashboardRoute, getRouteOwner, isAuthRoutes, UserRole } from "./lib/auth-utils";
 
-type UserRole = "ADMIN" | "DOCTOR" | "PATIENT";
-
-type RouteConfig = {
-  exact: string[];
-  patterns: RegExp[];
-};
-
-const authRoutes = [
-  "/login",
-  "/register",
-  "/forgot-password",
-  "/reset-password",
-];
-
-const commonProtectedRoutes: RouteConfig = {
-  exact: ["/my-profile", "/settings"],
-  patterns: [],
-};
-
-const doctorProtectedRoutes: RouteConfig = {
-  exact: [],
-  patterns: [/^\/doctor/],
-};
-
-const adminProtectedRoutes: RouteConfig = {
-  exact: [],
-  patterns: [/^\/admin/],
-};
-
-const patientProtectedRoutes: RouteConfig = {
-  exact: [],
-  patterns: [/^\dashboard/],
-};
-
-const isAuthRoutes = (pathname: string) => {
-  return authRoutes.some((route: string) => {
-    return route === pathname;
-  });
-};
-
-const isRouteMatches = (pathname: string, routes: RouteConfig): boolean => {
-  if (routes.exact.includes(pathname)) {
-    return true;
-  }
-  return routes.patterns.some((pattern: RegExp) => pattern.test(pathname));
-};
-
-const getRouteOwner = (
-  pathname: string,
-): "ADMIN" | "DOCTOR" | "PATIENT" | "COMMON" | null => {
-  if (isRouteMatches(pathname, adminProtectedRoutes)) {
-    return "ADMIN";
-  }
-  if (isRouteMatches(pathname, doctorProtectedRoutes)) {
-    return "DOCTOR";
-  }
-  if (isRouteMatches(pathname, patientProtectedRoutes)) {
-    return "PATIENT";
-  }
-  if (isRouteMatches(pathname, commonProtectedRoutes)) {
-    return "COMMON";
-  }
-  return null;
-};
-
-const getDefaultDashboardRoute = (role: string): string => {
-  if (role === "ADMIN") {
-    return "/admin/dashboard";
-  }
-  if (role === "DOCTOR") {
-    return "/doctor/dashboard";
-  }
-  if (role === "PATIENT") {
-    return "/dashboard";
-  }
-  return "/";
-};
 
 export async function proxy(request: NextRequest) {
   const cookieStore = await cookies();
@@ -113,13 +37,20 @@ export async function proxy(request: NextRequest) {
   //rule-1: user is logged in and trying to access auth route
   if (accessToken && isAuth) {
     return NextResponse.redirect(
-      new URL(getDefaultDashboardRoute(userRole!), request.url),
+      new URL(getDefaultDashboardRoute(userRole as UserRole), request.url),
     );
   }
 
   //rule-2: user is trying to access public route
   if (routeOwner === null) {
     return NextResponse.next();
+  }
+
+  //rule 1 & 2 open for public and auth routes
+  if (!accessToken) {
+    const loginUrl = new URL("/login", request.url);
+    loginUrl.searchParams.set("redirect", pathname);
+    return NextResponse.redirect(loginUrl);
   }
 
   //rule-3: user is trying to access common protected route
@@ -129,9 +60,33 @@ export async function proxy(request: NextRequest) {
     }
   }
 
+  //rule-4: user is trying to access rule based protected route
+
+  if (
+    routeOwner === "ADMIN" ||
+    routeOwner === "DOCTOR" ||
+    routeOwner === "PATIENT"
+  ) {
+    if (userRole !== routeOwner) {
+      return NextResponse.redirect(
+        new URL(getDefaultDashboardRoute(userRole as UserRole), request.url),
+      );
+    }
+    return NextResponse.next();
+  }
+
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/login", "/register", "/forgot-password", "/reset-password"],
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico, sitemap.xml, robots.txt (metadata files)
+     */
+    "/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|.well-known).*)",
+  ],
 };

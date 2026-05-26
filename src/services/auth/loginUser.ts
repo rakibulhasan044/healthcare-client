@@ -3,7 +3,10 @@
 
 import { cookies } from "next/headers";
 import z from "zod";
-import setCookieParser from "set-cookie-parser";
+import { parse } from "cookie";
+import { redirect } from "next/navigation";
+import jwt, { JwtPayload, Secret } from "jsonwebtoken";
+import { getDefaultDashboardRoute, isValidRedirectForRole, UserRole } from "@/lib/auth-utils";
 
 const loginValidationZodSchema = z.object({
   email: z.string({ error: "Invalid email address" }),
@@ -20,6 +23,10 @@ export const loginUser = async (
   formData: any,
 ): Promise<any> => {
   try {
+    const redirectTo = formData.get("redirect") || null;
+    console.log("redirected from server login:-", redirectTo);
+    let accessTokenObject: null | any = null;
+    let refreshTokenObject: null | any = null;
     const loginData = {
       email: formData.get("email"),
       password: formData.get("password"),
@@ -39,40 +46,7 @@ export const loginUser = async (
       };
     }
 
-    // const res = await fetch("http://localhost:4000/api/v1/auth/login", {
-    //   method: "POST",
-    //   body: JSON.stringify(loginData),
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //   },
-    // })
-    // // .then((res) => res.json());
-
-    // // return res;
-    // const result = await res.json();
-
-    // const cookieStore = await cookies();
-
-    // cookieStore.set("accessToken", result.data.accessToken, {
-    //   httpOnly: true,
-    //   secure: false,
-    //   sameSite: "lax",
-    // });
-
-    // cookieStore.set("refreshToken", result.data.refreshToken, {
-    //   httpOnly: true,
-    //   secure: false,
-    //   sameSite: "lax",
-    // });
-
-    // return {
-    //   success: result.success,
-    //   message: result.message,
-    //   data: {
-    //     needPasswordChange: result.data.needPasswordChange,
-    //   },
-    // };
-    const response = await fetch("http://localhost:4000/api/v1/auth/login", {
+    const res = await fetch("http://localhost:4000/api/v1/auth/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -83,27 +57,95 @@ export const loginUser = async (
       }),
     });
 
-    const cookieStore = await cookies();
+    // const cookieStore = await cookies();
+    // const rawCookies = response.headers.getSetCookie();
+    // const parsedCookies = setCookieParser.parse(rawCookies);
 
-    const rawCookies = response.headers.getSetCookie();
+    // for (const cookie of parsedCookies) {
+    //   cookieStore.set({
+    //     name: cookie.name,
+    //     value: cookie.value,
+    //     httpOnly: cookie.httpOnly,
+    //     secure: cookie.secure,
+    //     sameSite: cookie.sameSite as "lax" | "strict" | "none" | undefined,
+    //     path: cookie.path,
+    //     maxAge: cookie.maxAge,
+    //   });
+    // }
+    // return await response.json();
+    const setCookieHeaders = res.headers.getSetCookie();
 
-    const parsedCookies = setCookieParser.parse(rawCookies);
+    if (setCookieHeaders && setCookieHeaders.length > 0) {
+      setCookieHeaders.forEach((cookie: string) => {
+        const parsedCookie = parse(cookie);
 
-    for (const cookie of parsedCookies) {
-      cookieStore.set({
-        name: cookie.name,
-        value: cookie.value,
-        httpOnly: cookie.httpOnly,
-        secure: cookie.secure,
-        sameSite: cookie.sameSite as "lax" | "strict" | "none" | undefined,
-        path: cookie.path,
-        maxAge: cookie.maxAge,
+        if (parsedCookie["accessToken"]) {
+          accessTokenObject = parsedCookie;
+        }
+        if (parsedCookie["refreshToken"]) {
+          refreshTokenObject = parsedCookie;
+        }
       });
+    } else {
+      throw new Error("No Set-Cookie header found");
     }
 
-    return await response.json();
-  } catch (error) {
-    console.log(error);
+    if (!accessTokenObject) {
+      throw new Error("Tokens not found in cookies");
+    }
+
+    if (!refreshTokenObject) {
+      throw new Error("Tokens not found in cookies");
+    }
+
+    const cookieStore = await cookies();
+
+    cookieStore.set("accessToken", accessTokenObject.accessToken, {
+      secure: true,
+      httpOnly: true,
+      maxAge: parseInt(accessTokenObject["Max-Age"]) || 1000 * 60 * 60,
+      path: accessTokenObject.Path || "/",
+      sameSite: accessTokenObject["SameSite"] || "none",
+    });
+
+    cookieStore.set("refreshToken", refreshTokenObject.refreshToken, {
+      secure: true,
+      httpOnly: true,
+      maxAge:
+        parseInt(refreshTokenObject["Max-Age"]) || 1000 * 60 * 60 * 24 * 90,
+      path: refreshTokenObject.Path || "/",
+      sameSite: refreshTokenObject["SameSite"] || "none",
+    });
+
+    const verifiedToken: string | JwtPayload = jwt.verify(
+      accessTokenObject.accessToken,
+      process.env.JWT_SECRET as Secret,
+    );
+
+    if (typeof verifiedToken === "string") {
+      throw new Error("Invalid token");
+    }
+
+    const userRole: UserRole = verifiedToken.role;
+
+    if(redirectTo) {
+      const requestedPath = redirectTo.toString()
+      if(isValidRedirectForRole(requestedPath, userRole)){
+        redirect(requestedPath)
+      } else {
+        redirect(getDefaultDashboardRoute(userRole))
+      }
+    }
+
+    const redirectPath = redirectTo
+      ? redirectTo.toString()
+      : getDefaultDashboardRoute(userRole);
+
+    redirect(redirectPath);
+  } catch (error: any) {
+    if (error?.digest?.startsWith("NEXT_REDIRECT")) {
+      throw error;
+    }
     return {
       error: "Login failed",
     };
