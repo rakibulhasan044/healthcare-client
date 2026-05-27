@@ -1,6 +1,6 @@
 import PublicNavbar from "@/components/shared/PublicNavbar";
 
-const CommonLayout = ({ children }: { children: React.ReactNode }) => {
+const CommonDashboardLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <>
       <PublicNavbar />
@@ -9,4 +9,4 @@ const CommonLayout = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-export default CommonLayout;
+export default CommonDashboardLayout;

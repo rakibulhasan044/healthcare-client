@@ -28,7 +28,6 @@ export const loginUser = async (
 ): Promise<any> => {
   try {
     const redirectTo = formData.get("redirect") || null;
-    console.log("redirected from server login:-", redirectTo);
     let accessTokenObject: null | any = null;
     let refreshTokenObject: null | any = null;
     const loginData = {
@@ -89,10 +88,7 @@ export const loginUser = async (
     }
 
     if (!result.success) {
-      return {
-        success: false,
-        error: result.message || "Login failed",
-      };
+      throw new Error(result?.message || "Login failed");
     }
 
     let userRole: UserRole;
@@ -103,10 +99,10 @@ export const loginUser = async (
         process.env.JWT_SECRET as Secret,
       ) as JwtPayload;
       userRole = verifiedToken.role;
-    } catch (error) {
+    } catch (error: any) {
       return {
         success: false,
-        error: "Invalid authentication token",
+        message: error?.message || "Invalid authentication token",
       };
     }
 
@@ -141,7 +137,8 @@ export const loginUser = async (
       throw error;
     }
     return {
-      error: "Login failed",
+      success: false,
+      message: `${process.env.NODE_ENV === "development" ? error?.message : "Login failed"}`,
     };
   }
 };

@@ -12,14 +12,14 @@ const registerValidationZodSchema = z
     email: z.email("Invalid email address"),
     password: z
       .string()
-      .min(6, {
-        error: "password is required and must be 6 characters long",
+      .min(4, {
+        error: "password is required and must be 4 characters long",
       })
       .max(30),
     confirmPassword: z
       .string()
       .min(6, {
-        error: "confirm password is required and must be 6 characters long",
+        error: "confirm password is required and must be 4 characters long",
       })
       .max(30),
   })
@@ -95,6 +95,9 @@ export const registerPatient = async (
     if (error?.digest?.startsWith("NEXT_REDIRECT")) {
       throw error;
     }
-    return { error: "Registration failed" };
+    return {
+      success: false,
+      message: `${process.env.NODE_ENV === "development" ? error?.message : "Registration failed. Please try again"}`,
+    };
   }
 };
