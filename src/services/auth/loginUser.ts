@@ -16,8 +16,8 @@ const loginValidationZodSchema = z.object({
   email: z.string({ error: "Invalid email address" }),
   password: z
     .string()
-    .min(6, {
-      error: "password is required and must be 6 characters long",
+    .min(4, {
+      error: "password is required and must be 4 characters long",
     })
     .max(30),
 });
@@ -125,12 +125,12 @@ export const loginUser = async (
     if (redirectTo) {
       const requestedPath = redirectTo.toString();
       if (isValidRedirectForRole(requestedPath, userRole)) {
-        redirect(requestedPath);
+        redirect(`${requestedPath}?loggedIn=true`);
       } else {
-        redirect(getDefaultDashboardRoute(userRole));
+        redirect(`${getDefaultDashboardRoute(userRole)}?loggedIn=true`);
       }
     } else {
-      redirect(getDefaultDashboardRoute(userRole));
+      redirect(`${getDefaultDashboardRoute(userRole)}?loggedIn=true`);
     }
   } catch (error: any) {
     if (error?.digest?.startsWith("NEXT_REDIRECT")) {

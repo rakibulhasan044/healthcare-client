@@ -4,20 +4,20 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 import { toast } from "sonner";
 
-const LogoutSuccessToast = () => {
+const LoginSuccessToast = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
 
   useEffect(() => {
-    if (searchParams.get("loggedOut") === "true") {
-      toast.success("Logged Out Successfully");
+    if (searchParams.get("loggedIn") === "true") {
+      toast.success("Logged In Successfully");
 
       const newURl = new URL(window.location.href);
-      newURl.searchParams.delete("loggedOut");
+      newURl.searchParams.delete("loggedIn");
       router.replace(newURl.toString());
     }
   }, [searchParams, router]);
   return null;
 };
 
-export default LogoutSuccessToast;
+export default LoginSuccessToast;
