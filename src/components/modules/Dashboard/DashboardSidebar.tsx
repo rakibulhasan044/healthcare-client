@@ -1,7 +1,23 @@
-const DashboardSidebar = () => {
-  return (
-    <div>DashboardSidebar</div>
-  )
-}
+"use server";
 
-export default DashboardSidebar
+import { getUserInfo } from "@/services/auth/getUserInfo";
+import { UserInfo } from "@/types/user.interface";
+import DashboardSidebarContent from "./DashboardSidebarContent";
+import { NavSection } from "@/types/dashboard.interface";
+import { getDefaultDashboardRoute } from "@/lib/auth-utils";
+
+const DashboardSidebar = async () => {
+  const userInfo = (await getUserInfo()) as UserInfo;
+  const navItems: NavSection[] = [];
+  const dashboardHome = getDefaultDashboardRoute(userInfo.role);
+
+  return (
+    <DashboardSidebarContent
+      userInfo={userInfo}
+      navItems={navItems}
+      dashboardHome={dashboardHome}
+    />
+  );
+};
+
+export default DashboardSidebar;
