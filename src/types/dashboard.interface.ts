@@ -6,15 +6,15 @@ export interface IDashboardNavbarContent {
 }
 
 export interface NavItem {
-  title: string | "link";
-  href: string | "href";
+  title: string;
+  href: string;
   icon: string;
   badge: string | number;
   description: string;
-  role: UserRole[];
+  roles: UserRole[];
 }
 
 export interface NavSection {
-  title?: string | 'title';
+  title?: string;
   items: NavItem[];
 }
