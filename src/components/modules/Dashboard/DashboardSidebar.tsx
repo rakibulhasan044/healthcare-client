@@ -5,10 +5,11 @@ import { UserInfo } from "@/types/user.interface";
 import DashboardSidebarContent from "./DashboardSidebarContent";
 import { NavSection } from "@/types/dashboard.interface";
 import { getDefaultDashboardRoute } from "@/lib/auth-utils";
+import { getNavItemsByRole } from "@/lib/navItems.config";
 
 const DashboardSidebar = async () => {
   const userInfo = (await getUserInfo()) as UserInfo;
-  const navItems: NavSection[] = [];
+  const navItems: NavSection[] = getNavItemsByRole(userInfo.role);
   const dashboardHome = getDefaultDashboardRoute(userInfo.role);
 
   return (

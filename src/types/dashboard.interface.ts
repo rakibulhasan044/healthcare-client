@@ -1,16 +1,11 @@
 import { UserRole } from "@/lib/auth-utils";
-import { UserInfo } from "./user.interface";
-
-export interface IDashboardNavbarContent {
-  userInfo: UserInfo;
-}
 
 export interface NavItem {
   title: string;
   href: string;
   icon: string;
-  badge: string | number;
-  description: string;
+  badge?: string | number;
+  description?: string;
   roles: UserRole[];
 }
 

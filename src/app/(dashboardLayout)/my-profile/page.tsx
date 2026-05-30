@@ -1,7 +1,6 @@
-
 const page = () => {
   return (
-    <div>my prescription page</div>
+    <div>my profile</div>
   )
 }
 
