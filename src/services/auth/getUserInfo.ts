@@ -4,7 +4,6 @@
 import { UserInfo } from "@/types/user.interface";
 import { getCookie } from "./tokenHandler";
 import jwt, { JwtPayload } from "jsonwebtoken";
-import { use } from "react";
 
 export const getUserInfo = async (): Promise<UserInfo | null> => {
   try {
@@ -29,6 +28,7 @@ export const getUserInfo = async (): Promise<UserInfo | null> => {
     }
 
     const userInfo: UserInfo = {
+      name: verifiedToken.name,
       email: verifiedToken.email,
       role: verifiedToken.role,
     };
