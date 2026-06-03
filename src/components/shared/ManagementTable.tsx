@@ -1,3 +1,4 @@
+'use client'
 import { Delete, Edit, Eye, Loader2, MoreHorizontal } from "lucide-react";
 import React from "react";
 import {
@@ -64,7 +65,7 @@ function ManagementTable<T>({
                   {column.header}
                 </TableHead>
               ))}
-              {hasAction && <TableHead className="w-[70px]">Actions</TableHead>}
+              {hasAction && <TableHead className="w-17.5">Actions</TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
