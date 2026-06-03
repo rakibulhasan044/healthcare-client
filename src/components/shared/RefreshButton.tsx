@@ -1,4 +1,5 @@
-'use client'
+"use client";
+
 import { RefreshCcw } from "lucide-react";
 import { Button } from "../ui/button";
 import { useRouter } from "next/dist/client/components/navigation";
@@ -15,13 +16,13 @@ const RefreshButton = ({
   variant = "default",
   showLabel = true,
 }: RefreshButtonProps) => {
-  const router = useRouter()
+  const router = useRouter();
 
-  const [isPending, startTransition] = useTransition()
+  const [isPending, startTransition] = useTransition();
   const handleRefresh = () => {
     startTransition(() => {
-      router.refresh()
-    })
+      router.refresh();
+    });
   };
   return (
     <Button

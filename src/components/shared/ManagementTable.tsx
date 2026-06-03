@@ -1,4 +1,5 @@
-'use client'
+"use client";
+
 import { Delete, Edit, Eye, Loader2, MoreHorizontal } from "lucide-react";
 import React from "react";
 import {
