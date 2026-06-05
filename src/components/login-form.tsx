@@ -7,24 +7,16 @@ import { Field, FieldDescription, FieldGroup, FieldLabel } from "./ui/field";
 import { Input } from "./ui/input";
 import { loginUser } from "@/services/auth/loginUser";
 import { toast } from "sonner";
+import InputFieldError from "./shared/InputFieldError";
 
 const LoginForm = ({ redirect }: { redirect?: string }) => {
   const [state, formAction, isPending] = useActionState(loginUser, null);
 
-  const getFieldError = (fieldName: string) => {
-    if (state && state.errors) {
-      const error = state.errors.find((err: any) => err.field === fieldName);
-      return error?.message;
-    } else {
-      return null;
+  useEffect(() => {
+    if (state && !state.success && state.message) {
+      toast.error(state.message);
     }
-  };
-
-  useEffect(()=>{
-    if(state && !state.success && state.message){
-      toast.error(state.message)
-    }
-  },[state])
+  }, [state]);
 
   return (
     <form action={formAction}>
@@ -41,22 +33,15 @@ const LoginForm = ({ redirect }: { redirect?: string }) => {
             placeholder="example@gmail.com"
             required
           />
-          {getFieldError("email") && (
-            <FieldDescription className="text-red-600">
-              {getFieldError("email")}
-            </FieldDescription>
-          )}
+          <InputFieldError field="email" state={state} />
         </Field>
 
         <Field>
           <FieldLabel htmlFor="password">Password</FieldLabel>
           <Input id="password" name="password" type="password" required />
-          {getFieldError("password") && (
-            <FieldDescription className="text-red-600">
-              {getFieldError("password")}
-            </FieldDescription>
-          )}
+          <InputFieldError field="password" state={state} />
         </Field>
+
         <FieldGroup className="mt-4">
           <Field>
             <Button

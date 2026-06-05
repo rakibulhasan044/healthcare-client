@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
 
-import z from "zod";
 import { parse } from "cookie";
 import { redirect } from "next/navigation";
 import jwt, { JwtPayload, Secret } from "jsonwebtoken";
@@ -11,18 +10,9 @@ import {
   UserRole,
 } from "@/lib/auth-utils";
 import { setCookie } from "./tokenHandler";
-import { serverFetch } from "./server-fetch";
+import { serverFetch } from "../../lib/server-fetch";
 import { zodValidatorSchema } from "../../lib/zodvalidator";
-
-const loginValidationZodSchema = z.object({
-  email: z.string({ error: "Invalid email address" }),
-  password: z
-    .string()
-    .min(4, {
-      error: "password is required and must be 4 characters long",
-    })
-    .max(30),
-});
+import { loginValidationZodSchema } from "@/zod/authValidation";
 
 export const loginUser = async (
   _currentState: any,
@@ -47,13 +37,12 @@ export const loginUser = async (
       loginValidationZodSchema,
     ).data;
 
-    const res = await serverFetch.post(
-      "http://localhost:4000/api/v1/auth/login",
-      {
-        body: JSON.stringify(validatedPayload),
+    const res = await serverFetch.post("/auth/login", {
+      body: JSON.stringify(validatedPayload),
+      headers: {
+        "Content-Type": "application/json",
       },
-    );
-    console.log(res);
+    });
 
     const result = await res.json();
 

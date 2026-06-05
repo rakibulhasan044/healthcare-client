@@ -1,12 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+'use server'
 
 import z from "zod";
-import { serverFetch } from "../auth/server-fetch";
+import { serverFetch } from "../../lib/server-fetch";
 import { zodValidatorSchema } from "../../lib/zodvalidator";
-
-const createSpecialityZodSchema = z.object({
-  title: z.string().min(3, "Title must be at least 3 characters long"),
-});
+import { createSpecialityZodSchema } from "@/zod/specialitiesValidation";
 
 export async function createSpeciality(_prevState: any, formData: FormData) {
   try {
@@ -14,10 +12,15 @@ export async function createSpeciality(_prevState: any, formData: FormData) {
       title: formData.get("title") as string,
     };
 
-    if(zodValidatorSchema(payload, createSpecialityZodSchema).success === false) {
+    if (
+      zodValidatorSchema(payload, createSpecialityZodSchema).success === false
+    ) {
       return zodValidatorSchema(payload, createSpecialityZodSchema);
     }
-    const validatedPayload = zodValidatorSchema(payload, createSpecialityZodSchema).data;
+    const validatedPayload = zodValidatorSchema(
+      payload,
+      createSpecialityZodSchema,
+    ).data;
 
     const newFormData = new FormData();
     newFormData.append("data", JSON.stringify(validatedPayload));
