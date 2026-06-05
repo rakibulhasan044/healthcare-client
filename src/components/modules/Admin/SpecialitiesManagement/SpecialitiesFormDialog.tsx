@@ -16,17 +16,17 @@ import { createSpeciality } from "@/services/admin/specialitiesManagement";
 import { useActionState, useEffect } from "react";
 import { toast } from "sonner";
 
-interface SpecialitiesFromDialogProps {
+interface SpecialitiesFormDialogProps {
   open: boolean;
   onClose: () => void;
   onSuccess: () => void;
 }
 
-const SpecialitiesFromDialog = ({
+const SpecialitiesFormDialog = ({
   open,
   onClose,
   onSuccess,
-}: SpecialitiesFromDialogProps) => {
+}: SpecialitiesFormDialogProps) => {
   const [state, formAction, pending] = useActionState(createSpeciality, null);
 
   useEffect(() => {
@@ -79,4 +79,4 @@ const SpecialitiesFromDialog = ({
   );
 };
 
-export default SpecialitiesFromDialog;
+export default SpecialitiesFormDialog;
