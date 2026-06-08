@@ -41,9 +41,6 @@ const SpecialitiesFormDialog = ({
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <form action={formAction}>
-        <DialogTrigger
-          render={<Button variant="outline">Open Dialog</Button>}
-        />
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
             <DialogTitle>Add new Speciality</DialogTitle>

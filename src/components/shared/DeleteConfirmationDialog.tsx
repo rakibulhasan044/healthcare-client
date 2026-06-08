@@ -34,9 +34,6 @@ const DeleteConfirmationDialog = ({
 }: DeleteConfirmationDialogProps) => {
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogTrigger
-        render={<Button variant="outline">Show Dialog</Button>}
-      />
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>{title}</AlertDialogTitle>

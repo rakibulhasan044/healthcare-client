@@ -63,15 +63,10 @@ export async function deleteSpeciality(id: string) {
     const result = await response.json();
     return result;
   } catch (error: any) {
+    console.log("error-->>",error);
     return {
       success: false,
       message: `${process.env.NODE_ENV === "development" ? error?.message : "Something went wrong"}`,
     };
   }
-}
-function zodValidator(
-  payload: { title: string },
-  createSpecialityZodSchema: z.ZodObject<{ title: z.ZodString }, z.core.$strip>,
-) {
-  throw new Error("Function not implemented.");
 }
