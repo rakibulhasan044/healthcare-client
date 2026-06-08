@@ -7,9 +7,8 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
-import { Field, FieldGroup } from "@/components/ui/field";
+import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { createSpeciality } from "@/services/admin/specialitiesManagement";
@@ -40,24 +39,26 @@ const SpecialitiesFormDialog = ({
   }, [state, onSuccess, onClose]);
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <form action={formAction}>
-        <DialogContent className="sm:max-w-sm">
-          <DialogHeader>
-            <DialogTitle>Add new Speciality</DialogTitle>
-          </DialogHeader>
-          <FieldGroup>
-            <Field>
-              <Label htmlFor="title">Title </Label>
-              <Input id="title" name="title" required />
-              <InputFieldError field="title" state={state} />
-            </Field>
-            <Field>
-              <Label htmlFor="file">Upload Icon (optional)</Label>
-              <Input id="file" name="file" type="file" />
-              <InputFieldError field="icon" state={state} />
-            </Field>
-          </FieldGroup>
-          <div className="flex items-center justify-end gap-2">
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle className="font-medium">Add New Specialty</DialogTitle>
+        </DialogHeader>
+
+        <form action={formAction} className="space-y-4">
+          <Field>
+            <FieldLabel htmlFor="title">Title</FieldLabel>
+            <Input id="title" name="title" placeholder="Cardiology" required />
+            <InputFieldError field="title" state={state} />
+          </Field>
+
+          <Field>
+            <FieldLabel htmlFor="file">Upload Icon</FieldLabel>
+
+            <Input id="file" name="file" type="file" accept="image/*" />
+            <InputFieldError field="file" state={state} />
+          </Field>
+
+          <div className="flex justify-end gap-2">
             <Button
               type="button"
               variant="outline"
@@ -67,13 +68,12 @@ const SpecialitiesFormDialog = ({
               Cancel
             </Button>
             <Button type="submit" disabled={pending}>
-              {pending ? "Saving..." : "Save Speciality"}
+              {pending ? "Saving..." : "Save Specialty"}
             </Button>
           </div>
-        </DialogContent>
-      </form>
+        </form>
+      </DialogContent>
     </Dialog>
   );
 };
-
 export default SpecialitiesFormDialog;

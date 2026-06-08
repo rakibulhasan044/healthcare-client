@@ -37,12 +37,10 @@ const Specialitiestable = ({ specialities }: SpecialitiestableProps) => {
     setIsDeletingDialog(false);
 
     if (result.success) {
-      console.log(result?.message || null);
       toast.success(result?.message || "Speciality deleted successfully");
       setDeletingSpeciality(null);
       handleRefresh();
     } else {
-      console.log("error mes--->>>",result?.message);
       toast.error(result?.message || "Speciality deleted failed");
       setDeletingSpeciality(null);
       handleRefresh();
