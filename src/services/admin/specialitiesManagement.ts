@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-'use server'
+"use server";
 
 import { serverFetch } from "../../lib/server-fetch";
 import { zodValidatorSchema } from "../../lib/zodvalidator";
@@ -43,7 +43,7 @@ export async function createSpeciality(_prevState: any, formData: FormData) {
   }
 }
 
-export async function getSpeciality() {
+export async function getSpecialities() {
   try {
     const response = await serverFetch.get("/specialties");
     const result = await response.json();
@@ -62,7 +62,7 @@ export async function deleteSpeciality(id: string) {
     const result = await response.json();
     return result;
   } catch (error: any) {
-    console.log("error-->>",error);
+    console.log("error-->>", error);
     return {
       success: false,
       message: `${process.env.NODE_ENV === "development" ? error?.message : "Something went wrong"}`,
