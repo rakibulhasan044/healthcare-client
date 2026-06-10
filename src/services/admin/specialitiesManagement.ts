@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use server'
 
-import z from "zod";
 import { serverFetch } from "../../lib/server-fetch";
 import { zodValidatorSchema } from "../../lib/zodvalidator";
 import { createSpecialityZodSchema } from "@/zod/specialitiesValidation";
