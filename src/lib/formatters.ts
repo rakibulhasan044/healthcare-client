@@ -1,5 +1,3 @@
-import { object } from "zod";
-
 export function getInitials(name: string): string {
   return name
     .split(" ")

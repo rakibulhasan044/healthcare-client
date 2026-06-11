@@ -3,6 +3,7 @@ import DoctorsTable from "@/components/modules/Admin/DoctorManagement/DoctorsTab
 import RefreshButton from "@/components/shared/RefreshButton";
 import SearchFilter from "@/components/shared/SearchFilter";
 import SelectFilter from "@/components/shared/SelectFilter";
+import TablePagination from "@/components/shared/TablePagination";
 import { TableSkeleton } from "@/components/shared/TableSkeleton";
 import { queryStringFormatter } from "@/lib/formatters";
 import { getDoctors } from "@/services/admin/doctorManagement";
@@ -19,6 +20,10 @@ const AdminDoctorManagementPage = async ({
   const queryString = queryStringFormatter(searchParamsObj);
   const specialitiesResult = await getSpecialities();
   const doctorsResult = await getDoctors(queryString);
+  const totalPage = Math.ceil(
+    doctorsResult.meta.total / doctorsResult.meta.limit,
+  );
+  
   return (
     <div className="space-y-6">
       <DoctorManagementHeader specialities={specialitiesResult.data} />
@@ -36,6 +41,10 @@ const AdminDoctorManagementPage = async ({
       </div>
       <Suspense fallback={<TableSkeleton columns={2} rows={10} />}>
         <DoctorsTable doctors={doctorsResult.data} />
+        <TablePagination
+          currentPage={doctorsResult.meta.page}
+          totalPages={totalPage}
+        />
       </Suspense>
     </div>
   );

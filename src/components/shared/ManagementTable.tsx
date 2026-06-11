@@ -1,6 +1,6 @@
 "use client";
 
-import { Delete, Edit, Eye, Loader2, MoreHorizontal } from "lucide-react";
+import { Edit, Eye, Loader2, MoreHorizontal, Trash } from "lucide-react";
 import React from "react";
 import {
   Table,
@@ -45,35 +45,38 @@ function ManagementTable<T>({
   emptyMessage = "No records found",
   isRefreshing = false,
 }: ManagementTableProps<T>) {
-  const hasAction = onView || onEdit || onDelete;
+  const hasActions = onView || onEdit || onDelete;
   return (
     <>
       <div className="rounded-lg border relative">
-        {/* refreshing overlay */}
+        {/* Refreshing Overlay */}
         {isRefreshing && (
-          <div className=" absolute inset-2 bg-background/50 backdrop-blur-2xl-[2px] flex items-center justify-center z-10 rounded-l">
+          <div className="absolute inset-0 bg-background/50 backdrop-blur-[2px] flex items-center justify-center z-10 rounded-lg">
             <div className="flex flex-col items-center gap-2">
               <Loader2 className="h-6 w-6 animate-spin text-primary" />
-              <p className="text-sm text-muted-foreground">Refreshing</p>
+              <p className="text-sm text-muted-foreground">Refreshing...</p>
             </div>
           </div>
         )}
+
         <Table>
           <TableHeader>
             <TableRow>
-              {columns.map((column, idx) => (
-                <TableHead key={idx} className={column.className}>
+              {columns?.map((column, colIndex) => (
+                <TableHead key={colIndex} className={column.className}>
                   {column.header}
                 </TableHead>
               ))}
-              {hasAction && <TableHead className="w-17.5">Actions</TableHead>}
+
+              {hasActions && <TableHead className="w-17.5">Actions</TableHead>}
             </TableRow>
           </TableHeader>
+
           <TableBody>
             {data.length === 0 ? (
               <TableRow>
                 <TableCell
-                  colSpan={columns.length + (hasAction ? 1 : 0)}
+                  colSpan={columns.length + (hasActions ? 1 : 0)}
                   className="text-center py-8 text-muted-foreground"
                 >
                   {emptyMessage}
@@ -89,13 +92,13 @@ function ManagementTable<T>({
                         : String(item[col.accessor])}
                     </TableCell>
                   ))}
-                  {hasAction && (
+                  {hasActions && (
                     <TableCell>
                       <DropdownMenu>
                         <DropdownMenuTrigger
                           render={
-                            <Button variant={"ghost"} size={"icon"}>
-                              <MoreHorizontal className="h-4 w-4" />
+                            <Button variant="ghost" size="icon">
+                              <MoreHorizontal />
                             </Button>
                           }
                         ></DropdownMenuTrigger>
@@ -106,19 +109,18 @@ function ManagementTable<T>({
                               View
                             </DropdownMenuItem>
                           )}
-                        </DropdownMenuContent>
-                        <DropdownMenuContent align="end">
                           {onEdit && (
                             <DropdownMenuItem onClick={() => onEdit(item)}>
                               <Edit className="mr-2 h-4 w-4" />
                               Edit
                             </DropdownMenuItem>
                           )}
-                        </DropdownMenuContent>
-                        <DropdownMenuContent align="end">
                           {onDelete && (
-                            <DropdownMenuItem onClick={() => onDelete(item)}>
-                              <Delete className="mr-2 h-4 w-4" />
+                            <DropdownMenuItem
+                              onClick={() => onDelete(item)}
+                              className="text-destructive"
+                            >
+                              <Trash className="mr-2 h-4 w-4" />
                               Delete
                             </DropdownMenuItem>
                           )}
