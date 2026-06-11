@@ -62,7 +62,7 @@ export async function deleteSpeciality(id: string) {
     const result = await response.json();
     return result;
   } catch (error: any) {
-    console.log("error-->>", error);
+    console.log("error->", error);
     return {
       success: false,
       message: `${process.env.NODE_ENV === "development" ? error?.message : "Something went wrong"}`,

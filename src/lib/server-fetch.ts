@@ -1,4 +1,4 @@
-import { getCookie } from "../services/auth/tokenHandler";
+import { getCookie } from "@/services/auth/tokenHandler";
 
 const BACKEND_API_URL =
   process.env.NEXT_PUBLIC_BASE_API_URL || "http://localhost:4000/api/v1";
@@ -10,7 +10,6 @@ const serverFetchHelper = async (
   const { headers, ...restOptions } = options;
   const accessToken = await getCookie("accessToken");
 
-  console.log(`${BACKEND_API_URL}/user/create-patient`);
   const response = await fetch(`${BACKEND_API_URL}${endpoint}`, {
     headers: {
       ...headers,
@@ -18,6 +17,7 @@ const serverFetchHelper = async (
     },
     ...restOptions,
   });
+
   return response;
 };
 

@@ -2,24 +2,19 @@
 "use server";
 
 import { UserInfo } from "@/types/user.interface";
-import { getCookie } from "./tokenHandler";
 import jwt, { JwtPayload } from "jsonwebtoken";
+import { getCookie } from "./tokenHandler";
 
 export const getUserInfo = async (): Promise<UserInfo | null> => {
   try {
     const accessToken = await getCookie("accessToken");
+
     if (!accessToken) {
       return null;
     }
 
-    const token =
-      typeof accessToken === "string" ? accessToken : accessToken.value;
-    if (!token) {
-      return null;
-    }
-
     const verifiedToken = jwt.verify(
-      token,
+      accessToken,
       process.env.JWT_SECRET as string,
     ) as JwtPayload;
 
@@ -28,7 +23,7 @@ export const getUserInfo = async (): Promise<UserInfo | null> => {
     }
 
     const userInfo: UserInfo = {
-      name: verifiedToken.name,
+      name: verifiedToken.name || "Unknown User",
       email: verifiedToken.email,
       role: verifiedToken.role,
     };
