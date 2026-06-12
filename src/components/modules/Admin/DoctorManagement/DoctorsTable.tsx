@@ -8,17 +8,20 @@ import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { doctorsColumns } from "./DoctorColumns";
 import DoctorViewDetailsDialog from "./DoctorViewDetailsDialog";
-import { vi } from "zod/locales";
+import DoctorFormDialog from "./DoctorFormDialog";
+import { ISpecialty } from "@/types/specialities.interface";
 
 interface IDoctorTableProps {
   doctors: IDoctor[];
+  specialities: ISpecialty[];
 }
-const DoctorTable = ({ doctors }: IDoctorTableProps) => {
+const DoctorTable = ({ doctors, specialities }: IDoctorTableProps) => {
   const router = useRouter();
   const [, startTransition] = useTransition();
   const [deletingDoctor, setDeletingDoctor] = useState<IDoctor | null>(null);
   const [viewingDoctor, setViewingDoctor] = useState<IDoctor | null>(null);
   const [isDeletingDialog, setIsDeletingDialog] = useState(false);
+  const [editingDoctor, setEditingDoctor] = useState<IDoctor | null>(null);
 
   const handleRefresh = () => {
     startTransition(() => {
@@ -28,6 +31,10 @@ const DoctorTable = ({ doctors }: IDoctorTableProps) => {
 
   const handleView = (doctor: IDoctor) => {
     setViewingDoctor(doctor);
+  };
+
+  const handleEdit = (doctor: IDoctor) => {
+    setEditingDoctor(doctor);
   };
 
   const handleDelete = (doctor: IDoctor) => {
@@ -57,10 +64,21 @@ const DoctorTable = ({ doctors }: IDoctorTableProps) => {
         data={doctors}
         columns={doctorsColumns}
         onView={handleView}
-        onEdit={() => {}}
+        onEdit={handleEdit}
         onDelete={handleDelete}
         getRowKey={(doctor) => doctor.id!}
         emptyMessage="No doctors found"
+      />
+
+      <DoctorFormDialog
+        open={!!editingDoctor}
+        onClose={() => setEditingDoctor(null)}
+        doctor={editingDoctor!}
+        specialities={specialities}
+        onSuccess={() => {
+          setDeletingDoctor(null);
+          handleRefresh();
+        }}
       />
 
       <DoctorViewDetailsDialog
