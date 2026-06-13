@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { DateCell } from "@/components/shared/cell/DataCell";
@@ -20,22 +21,30 @@ export const doctorsColumns: Column<IDoctor>[] = [
   },
   {
     header: "Specialties",
-    accessor: (doctor) => (
-      <div className="flex flex-wrap gap-1">
-        {doctor.doctorSpecialties && doctor.doctorSpecialties.length > 0 ? (
-          doctor.doctorSpecialties.map((specialty, index) => (
-            <span
-              key={specialty.specialties?.id || index}
-              className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
-            >
-              {specialty.specialties?.title || "N/A"}
-            </span>
-          ))
-        ) : (
-          <span className="text-xs text-gray-500">No specialties</span>
-        )}
-      </div>
-    ),
+    // const specialties: any = doctor.doctorSpecialties;
+    accessor: (doctor) => {
+      const specialties: any = doctor.doctorSpecialties;
+
+      if (!specialties || specialties.length === 0) {
+        return <span className="text-xs text-gray-500"> No Specialties</span>;
+      }
+      return (
+        <div className="flex flex-wrap gap-1">
+          {specialties.map((item: any, index: any) => {
+            const specialtyTitle = item.specialties?.title || "N/A";
+            const specialtyId = item.specialties?.id || index;
+            return (
+              <span
+                key={specialtyId}
+                className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+              >
+                {specialtyTitle}
+              </span>
+            );
+          })}
+        </div>
+      );
+    },
   },
   {
     header: "Contact",
@@ -61,17 +70,17 @@ export const doctorsColumns: Column<IDoctor>[] = [
       </span>
     ),
   },
-//   {
-//     header: "Rating",
-//     accessor: (doctor) => (
-//       <div className="flex items-center gap-1">
-//         <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-//         <span className="text-sm font-medium">
-//           {doctor.averageRating!.toFixed(1)}
-//         </span>
-//       </div>
-//     ),
-//   },
+  //   {
+  //     header: "Rating",
+  //     accessor: (doctor) => (
+  //       <div className="flex items-center gap-1">
+  //         <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+  //         <span className="text-sm font-medium">
+  //           {doctor.averageRating!.toFixed(1)}
+  //         </span>
+  //       </div>
+  //     ),
+  //   },
   {
     header: "Gender",
     accessor: (doctor) => (

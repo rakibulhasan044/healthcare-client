@@ -5,13 +5,13 @@ import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import DoctorFormDialog from "./DoctorFormDialog";
-import { ISpecialty } from "@/types/specialities.interface";
+import { ISpecialty } from "@/types/specialties.interface";
 
 interface IDoctorManagementHeaderProps {
-  specialities?: ISpecialty[];
+  specialties?: ISpecialty[];
 }
 const DoctorManagementHeader = ({
-  specialities,
+  specialties: specialties,
 }: IDoctorManagementHeaderProps) => {
   const router = useRouter();
   const [, startTransition] = useTransition();
@@ -28,7 +28,7 @@ const DoctorManagementHeader = ({
         open={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
         onSuccess={handleSuccess}
-        specialities={specialities}
+        specialties={specialties}
       />
 
       <ManagementPageHeader

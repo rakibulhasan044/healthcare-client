@@ -9,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ISpecialty } from "@/types/specialities.interface";
+import { ISpecialty } from "@/types/specialties.interface";
 import { X } from "lucide-react";
 
 interface SpecialtyMultiSelectProps {
@@ -46,7 +46,7 @@ const SpecialtyMultiSelect = ({
         type="hidden"
         name="specialties"
         value={JSON.stringify(
-          isEdit ? getNewSpecialties() : selectedSpecialtyIds
+          isEdit ? getNewSpecialties() : selectedSpecialtyIds,
         )}
       />
       {isEdit && (

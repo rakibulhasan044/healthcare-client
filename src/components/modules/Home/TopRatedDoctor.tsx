@@ -78,7 +78,7 @@ const TopRatedDoctors = () => {
             Our Top Rated Doctor
           </h2>
           <p className="text-muted-foreground mt-4">
-            Access to medical experts from various specialities, ready to
+            Access to medical experts from various specialties, ready to
             provide you with top-notch medical services.
           </p>
         </div>

@@ -3,22 +3,22 @@
 
 import { serverFetch } from "../../lib/server-fetch";
 import { zodValidatorSchema } from "../../lib/zodvalidator";
-import { createSpecialityZodSchema } from "@/zod/specialitiesValidation";
+import { createSpecialtyZodSchema } from "@/zod/specialtiesValidation";
 
-export async function createSpeciality(_prevState: any, formData: FormData) {
+export async function createSpecialty(_prevState: any, formData: FormData) {
   try {
     const payload = {
       title: formData.get("title") as string,
     };
 
     if (
-      zodValidatorSchema(payload, createSpecialityZodSchema).success === false
+      zodValidatorSchema(payload, createSpecialtyZodSchema).success === false
     ) {
-      return zodValidatorSchema(payload, createSpecialityZodSchema);
+      return zodValidatorSchema(payload, createSpecialtyZodSchema);
     }
     const validatedPayload = zodValidatorSchema(
       payload,
-      createSpecialityZodSchema,
+      createSpecialtyZodSchema,
     ).data;
 
     const newFormData = new FormData();
@@ -43,7 +43,7 @@ export async function createSpeciality(_prevState: any, formData: FormData) {
   }
 }
 
-export async function getSpecialities() {
+export async function getSpecialties() {
   try {
     const response = await serverFetch.get("/specialties");
     const result = await response.json();
@@ -56,7 +56,7 @@ export async function getSpecialities() {
   }
 }
 
-export async function deleteSpeciality(id: string) {
+export async function deleteSpecialty(id: string) {
   try {
     const response = await serverFetch.delete(`/specialties/${id}`);
     const result = await response.json();

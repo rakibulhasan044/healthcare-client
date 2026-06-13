@@ -9,13 +9,16 @@ import { toast } from "sonner";
 import { doctorsColumns } from "./DoctorColumns";
 import DoctorViewDetailsDialog from "./DoctorViewDetailsDialog";
 import DoctorFormDialog from "./DoctorFormDialog";
-import { ISpecialty } from "@/types/specialities.interface";
+import { ISpecialty } from "@/types/specialties.interface";
 
 interface IDoctorTableProps {
   doctors: IDoctor[];
-  specialities: ISpecialty[];
+  specialties: ISpecialty[];
 }
-const DoctorTable = ({ doctors, specialities }: IDoctorTableProps) => {
+const DoctorTable = ({
+  doctors,
+  specialties: specialties,
+}: IDoctorTableProps) => {
   const router = useRouter();
   const [, startTransition] = useTransition();
   const [deletingDoctor, setDeletingDoctor] = useState<IDoctor | null>(null);
@@ -49,11 +52,11 @@ const DoctorTable = ({ doctors, specialities }: IDoctorTableProps) => {
     setIsDeletingDialog(false);
 
     if (result.success) {
-      toast.success(result?.message || "Speciality deleted successfully");
+      toast.success(result?.message || "Specialty deleted successfully");
       setDeletingDoctor(null);
       handleRefresh();
     } else {
-      toast.error(result?.message || "Speciality deleted failed");
+      toast.error(result?.message || "Specialty deleted failed");
       setDeletingDoctor(null);
       handleRefresh();
     }
@@ -74,7 +77,7 @@ const DoctorTable = ({ doctors, specialities }: IDoctorTableProps) => {
         open={!!editingDoctor}
         onClose={() => setEditingDoctor(null)}
         doctor={editingDoctor!}
-        specialities={specialities}
+        specialties={specialties}
         onSuccess={() => {
           setDeletingDoctor(null);
           handleRefresh();

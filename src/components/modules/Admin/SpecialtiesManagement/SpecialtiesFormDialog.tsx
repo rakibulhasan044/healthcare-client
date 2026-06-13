@@ -10,22 +10,22 @@ import {
 } from "@/components/ui/dialog";
 import { Field, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { createSpeciality } from "@/services/admin/specialitiesManagement";
+import { createSpecialty } from "@/services/admin/specialtiesManagement";
 import { useActionState, useEffect } from "react";
 import { toast } from "sonner";
 
-interface SpecialitiesFormDialogProps {
+interface SpecialtiesFormDialogProps {
   open: boolean;
   onClose: () => void;
   onSuccess: () => void;
 }
 
-const SpecialitiesFormDialog = ({
+const SpecialtiesFormDialog = ({
   open,
   onClose,
   onSuccess,
-}: SpecialitiesFormDialogProps) => {
-  const [state, formAction, pending] = useActionState(createSpeciality, null);
+}: SpecialtiesFormDialogProps) => {
+  const [state, formAction, pending] = useActionState(createSpecialty, null);
 
   useEffect(() => {
     if (state && state?.success) {
@@ -75,4 +75,4 @@ const SpecialitiesFormDialog = ({
     </Dialog>
   );
 };
-export default SpecialitiesFormDialog;
+export default SpecialtiesFormDialog;

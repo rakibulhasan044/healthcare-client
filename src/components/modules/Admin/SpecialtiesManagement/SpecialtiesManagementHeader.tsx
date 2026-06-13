@@ -4,9 +4,9 @@ import ManagementPageHeader from "@/components/shared/ManagementPageHeader";
 import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import SpecialitiesFormDialog from "./SpecialitiesFormDialog";
+import SpecialtiesFormDialog from "./SpecialtiesFormDialog";
 
-const SpecialitiesManagementHeader = () => {
+const SpecialtiesManagementHeader = () => {
   const router = useRouter();
   const [, startTransition] = useTransition();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -18,7 +18,7 @@ const SpecialitiesManagementHeader = () => {
   };
   return (
     <>
-      <SpecialitiesFormDialog
+      <SpecialtiesFormDialog
         open={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
         onSuccess={handleSuccess}
@@ -37,4 +37,4 @@ const SpecialitiesManagementHeader = () => {
   );
 };
 
-export default SpecialitiesManagementHeader;
+export default SpecialtiesManagementHeader;
