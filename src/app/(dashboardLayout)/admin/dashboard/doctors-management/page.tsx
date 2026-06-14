@@ -1,14 +1,11 @@
+import DoctorFilters from "@/components/modules/Admin/DoctorManagement/DoctorFilters";
 import DoctorManagementHeader from "@/components/modules/Admin/DoctorManagement/DoctorManagementHeader";
 import DoctorsTable from "@/components/modules/Admin/DoctorManagement/DoctorsTable";
-import RefreshButton from "@/components/shared/RefreshButton";
-import SearchFilter from "@/components/shared/SearchFilter";
-import SelectFilter from "@/components/shared/SelectFilter";
 import TablePagination from "@/components/shared/TablePagination";
 import { TableSkeleton } from "@/components/shared/TableSkeleton";
 import { queryStringFormatter } from "@/lib/formatters";
 import { getDoctors } from "@/services/admin/doctorManagement";
 import { getSpecialties } from "@/services/admin/specialtiesManagement";
-import { ISpecialty } from "@/types/specialties.interface";
 import { Suspense } from "react";
 
 const AdminDoctorManagementPage = async ({
@@ -27,18 +24,7 @@ const AdminDoctorManagementPage = async ({
   return (
     <div className="space-y-6">
       <DoctorManagementHeader specialties={specialtiesResult.data || []} />
-      <div className="flex space-x-2">
-        <SearchFilter placeholder="search doctors..." />
-        <SelectFilter
-          paramName="specialty"
-          options={specialtiesResult?.data?.map((specialty: ISpecialty) => ({
-            label: specialty.title,
-            value: specialty.title,
-          }))}
-          placeholder="Filter by specialty"
-        />
-        <RefreshButton />
-      </div>
+      <DoctorFilters specialties={specialtiesResult.data || []} />
       <Suspense fallback={<TableSkeleton columns={2} rows={10} />}>
         <DoctorsTable
           doctors={doctorsResult.data}
