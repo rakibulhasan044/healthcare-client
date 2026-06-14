@@ -21,7 +21,7 @@ import { useSpecialtySelection } from "@/hooks/specialtyHooks/useSpecialtySelect
 import { createDoctor, updateDoctor } from "@/services/admin/doctorManagement";
 import { IDoctor } from "@/types/doctor.interface";
 import { ISpecialty } from "@/types/specialties.interface";
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import SpecialtyMultiSelect from "./SpecialtyMultiSelect";
 import Image from "next/image";
@@ -41,14 +41,15 @@ const DoctorFormDialog = ({
   doctor,
   specialties,
 }: IDoctorFormDialogProps) => {
+  const formRef = useRef<HTMLFormElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const isEdit = !!doctor;
 
-  const [selectedSpecialty, setSelectedSpecialty] = useState<string>("");
   const [gender, setGender] = useState<"MALE" | "FEMALE">(
     doctor?.gender || "MALE",
   );
 
-    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -67,34 +68,49 @@ const DoctorFormDialog = ({
   });
 
   const handleClose = () => {
-
-  }
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+    if (selectedFile) {
+      setSelectedFile(null); // Clear preview
+    }
+    formRef.current?.reset(); // Clear form
+    onClose(); // Close dialog
+  };
   const getSpecialtyTitle = (id: string): string => {
     return specialties?.find((s) => s.id == id)?.title || "unknown";
   };
 
   console.log({ state });
 
-
   useEffect(() => {
     if (state?.success) {
       toast.success(state.message);
+      if (formRef.current) {
+        formRef.current.reset();
+      }
       onSuccess();
       onClose();
     } else if (state && !state.success) {
       toast.error(state.message);
+
+      if (selectedFile && fileInputRef.current) {
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(selectedFile);
+        fileInputRef.current.files = dataTransfer.files;
+      }
     }
-  }, [state, onSuccess, onClose]);
+  }, [state, onSuccess, onClose, selectedFile]);
 
   return (
-        <Dialog open={open} onOpenChange={handleClose}>
+    <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="max-h-[90vh] flex flex-col p-0">
         <DialogHeader className="px-6 pt-6 pb-4">
           <DialogTitle>{isEdit ? "Edit Doctor" : "Add New Doctor"}</DialogTitle>
         </DialogHeader>
 
         <form
-          // ref={formRef}
+          ref={formRef}
           action={formAction}
           className="flex flex-col flex-1 min-h-0"
         >
@@ -164,7 +180,7 @@ const DoctorFormDialog = ({
               removedSpecialtyIds={specialtySelection.removedSpecialtyIds}
               currentSpecialtyId={specialtySelection.currentSpecialtyId}
               availableSpecialties={specialtySelection.getAvailableSpecialties(
-                specialties!
+                specialties!,
               )}
               isEdit={isEdit}
               onCurrentSpecialtyChange={
@@ -347,7 +363,7 @@ const DoctorFormDialog = ({
                   />
                 )}
                 <Input
-                  // ref={fileInputRef}
+                  ref={fileInputRef}
                   id="file"
                   name="file"
                   type="file"
@@ -375,8 +391,8 @@ const DoctorFormDialog = ({
               {pending
                 ? "Saving..."
                 : isEdit
-                ? "Update Doctor"
-                : "Create Doctor"}
+                  ? "Update Doctor"
+                  : "Create Doctor"}
             </Button>
           </div>
         </form>

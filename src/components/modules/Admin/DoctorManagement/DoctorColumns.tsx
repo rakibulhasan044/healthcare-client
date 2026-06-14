@@ -15,7 +15,7 @@ export const doctorsColumns: Column<IDoctor>[] = [
       <UserInfoCell
         name={doctor.name}
         email={doctor.email}
-        photo={doctor.profilePhoto}
+        photo={doctor.profilePhoto as string}
       />
     ),
   },
