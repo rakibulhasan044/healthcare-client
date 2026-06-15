@@ -27,12 +27,12 @@ const AdminDoctorManagementPage = async ({
       <DoctorFilters specialties={specialtiesResult.data || []} />
       <Suspense fallback={<TableSkeleton columns={2} rows={10} />}>
         <DoctorsTable
-          doctors={doctorsResult.data}
+          doctors={doctorsResult?.data}
           specialties={specialtiesResult?.data || []}
         />
         <TablePagination
-          currentPage={doctorsResult.meta.page}
-          totalPages={totalPage}
+          currentPage={doctorsResult?.meta?.page || 1}
+          totalPages={totalPage || 1}
         />
       </Suspense>
     </div>
