@@ -1,9 +1,7 @@
-import React from 'react'
+import HeartbeatLoader from "@/components/shared/HeartBeatLoader";
 
 const GlobalLoading = () => {
-  return (
-    <div>loader</div>
-  )
-}
+  return <HeartbeatLoader />;
+};
 
-export default GlobalLoading
+export default GlobalLoading;
