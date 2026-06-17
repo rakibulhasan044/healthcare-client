@@ -123,18 +123,14 @@ export default function Error({
                     variant="outline"
                     size="lg"
                     className="gap-2"
+                    nativeButton={false}
                     render={
                       <Link href="/">
                         <Home className="h-4 w-4" />
                         Back to Home
                       </Link>
                     }
-                  >
-                    {/* <Link href="/">
-                      <Home className="h-4 w-4" />
-                      Back to Home
-                    </Link> */}
-                  </Button>
+                  />
                 </div>
 
                 {/* Help Text */}
