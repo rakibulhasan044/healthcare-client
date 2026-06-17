@@ -1,4 +1,3 @@
-
 import z from "zod";
 
 export const registerPatientValidationZodSchema = z
@@ -25,7 +24,7 @@ export const registerPatientValidationZodSchema = z
     path: ["confirmPassword"],
   });
 
-  export const loginValidationZodSchema = z.object({
+export const loginValidationZodSchema = z.object({
   email: z.string({ error: "Invalid email address" }),
   password: z
     .string()
@@ -34,3 +33,15 @@ export const registerPatientValidationZodSchema = z
     })
     .max(30),
 });
+
+export const resetPasswordSchema = z
+  .object({
+    newPassword: z.string().min(6, "Password must be at least 6 characters"),
+    confirmPassword: z
+      .string()
+      .min(6, "Password must be at least 6 characters"),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: "Password don't match",
+    path: ["confirmPassword"],
+  });
