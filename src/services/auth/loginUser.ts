@@ -27,11 +27,10 @@ export const loginUser = async (
       password: formData.get("password"),
     };
 
-    if (
-      zodValidatorSchema(payload, loginValidationZodSchema).success === false
-    ) {
+    if (zodValidatorSchema(payload, loginValidationZodSchema).success === false) {
       return zodValidatorSchema(payload, loginValidationZodSchema);
     }
+
     const validatedPayload = zodValidatorSchema(
       payload,
       loginValidationZodSchema,
@@ -71,29 +70,10 @@ export const loginUser = async (
       throw new Error("Tokens not found in cookies");
     }
 
-    if (!result.success) {
-      throw new Error(result?.message || "Login failed");
-    }
-
-    let userRole: UserRole;
-
-    try {
-      const verifiedToken = jwt.verify(
-        accessTokenObject.accessToken,
-        process.env.JWT_SECRET as Secret,
-      ) as JwtPayload;
-      userRole = verifiedToken.role;
-    } catch (error: any) {
-      return {
-        success: false,
-        message: error?.message || "Invalid authentication token",
-      };
-    }
-
     await setCookie("accessToken", accessTokenObject.accessToken, {
       secure: true,
       httpOnly: true,
-      maxAge: parseInt(accessTokenObject["Max-Age"]) || 60 * 60,
+      maxAge: parseInt(accessTokenObject["Max-Age"]) || 1000 * 60 * 60,
       path: accessTokenObject.Path || "/",
       sameSite: accessTokenObject["SameSite"] || "none",
     });
@@ -101,10 +81,38 @@ export const loginUser = async (
     await setCookie("refreshToken", refreshTokenObject.refreshToken, {
       secure: true,
       httpOnly: true,
-      maxAge: parseInt(refreshTokenObject["Max-Age"]) || 60 * 60 * 24 * 90,
+      maxAge:
+        parseInt(refreshTokenObject["Max-Age"]) || 1000 * 60 * 60 * 24 * 90,
       path: refreshTokenObject.Path || "/",
       sameSite: refreshTokenObject["SameSite"] || "none",
     });
+    const verifiedToken: JwtPayload | string = jwt.verify(
+      accessTokenObject.accessToken,
+      process.env.JWT_SECRET as string,
+    );
+
+    if (typeof verifiedToken === "string") {
+      throw new Error("Invalid token");
+    }
+
+    const userRole: UserRole = verifiedToken.role;
+
+    if (!result.success) {
+      throw new Error(result.message || "Login failed");
+    }
+
+    if (redirectTo && result.data.needPasswordChange) {
+      const requestedPath = redirectTo.toString();
+      if (isValidRedirectForRole(requestedPath, userRole)) {
+        redirect(`/reset-password?redirect=${requestedPath}`);
+      } else {
+        redirect("/reset-password");
+      }
+    }
+
+    if (result.data.needPasswordChange) {
+      redirect("/reset-password");
+    }
 
     if (redirectTo) {
       const requestedPath = redirectTo.toString();
@@ -117,12 +125,14 @@ export const loginUser = async (
       redirect(`${getDefaultDashboardRoute(userRole)}?loggedIn=true`);
     }
   } catch (error: any) {
+    // Re-throw NEXT_REDIRECT errors so Next.js can handle them
     if (error?.digest?.startsWith("NEXT_REDIRECT")) {
       throw error;
     }
+    console.log(error);
     return {
       success: false,
-      message: `${process.env.NODE_ENV === "development" ? error?.message : "Login failed"}`,
+      message: `${process.env.NODE_ENV === "development" ? error.message : "Login Failed. You might have entered incorrect email or password."}`,
     };
   }
 };

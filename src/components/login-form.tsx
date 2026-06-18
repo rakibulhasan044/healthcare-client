@@ -11,6 +11,8 @@ import InputFieldError from "./shared/InputFieldError";
 const LoginForm = ({ redirect }: { redirect?: string }) => {
   const [state, formAction, isPending] = useActionState(loginUser, null);
 
+  console.log(state);
+
   useEffect(() => {
     if (state && !state.success && state.message) {
       toast.error(state.message);

@@ -54,16 +54,98 @@ export async function updateMyProfile(formData: FormData) {
   }
 }
 
+// export async function resetPassword(_prevState: any, formData: FormData) {
+//   const redirectTo = formData.get("redirect") || null;
+
+//   //build validation payload
+//   const validationPayload = {
+//     newPassword: formData.get("newPassword"),
+//     confirmPassword: formData.get("confirmPassword"),
+//   };
+
+//   //validate
+//   const validatedPayload = zodValidatorSchema(
+//     validationPayload,
+//     resetPasswordSchema,
+//   );
+
+//   if (!validatedPayload.success && validatedPayload.errors) {
+//     return {
+//       success: false,
+//       message: "Validation failed",
+//       formData: validationPayload,
+//       errors: validatedPayload.errors,
+//     };
+//   }
+
+//   try {
+//     const accessToken = await getCookie("accessToken");
+
+//     if (!accessToken) {
+//       throw new Error("User not authenticated");
+//     }
+
+//     const verifiedToken = jwt.verify(
+//       accessToken as string,
+//       process.env.JWT_SECRET!,
+//     ) as JwtPayload;
+
+//     const userRole: UserRole = verifiedToken.role;
+//     const user = await getUserInfo();
+
+//     const response = await serverFetch.post("/auth/reset-password", {
+//       body: JSON.stringify({
+//         id: user?.id,
+//         password: validationPayload.newPassword,
+//       }),
+//       headers: {
+//         Authorization: accessToken,
+//         "Content-Type": "application/json",
+//       },
+//     });
+
+//     const result = await response.json();
+
+//     if (!result.success) {
+//       throw new Error(result.message || "Reset password failed");
+//     }
+//     if (result.success) {
+//       revalidateTag("user-info", { expire: 0 });
+//     }
+
+//     if (redirectTo) {
+//       const requestedPath = redirectTo.toString();
+//       if (isValidRedirectForRole(requestedPath, userRole)) {
+//         redirect(`${requestedPath}?loggedIn=true`);
+//       } else {
+//         redirect(`${getDefaultDashboardRoute(userRole)}?loggedIn=true`);
+//       }
+//     } else {
+//       redirect(`${getDefaultDashboardRoute(userRole)}?loggedIn=true`);
+//     }
+//   } catch (error: any) {
+//     // Re-throw NEXT_REDIRECT errors so Next.js can handle them
+//     if (error?.digest?.startsWith("NEXT_REDIRECT")) {
+//       throw error;
+//     }
+//     return {
+//       success: false,
+//       message: error?.message || "Something went wrong",
+//       formData: validationPayload,
+//     };
+//   }
+// }
+
 export async function resetPassword(_prevState: any, formData: FormData) {
   const redirectTo = formData.get("redirect") || null;
 
-  //build validation payload
+  // Build validation payload
   const validationPayload = {
-    newPassword: formData.get("newPassword"),
-    confirmPassword: formData.get("confirmPassword"),
+    newPassword: formData.get("newPassword") as string,
+    confirmPassword: formData.get("confirmPassword") as string,
   };
 
-  //validate
+  // Validate
   const validatedPayload = zodValidatorSchema(
     validationPayload,
     resetPasswordSchema,
@@ -88,11 +170,12 @@ export async function resetPassword(_prevState: any, formData: FormData) {
     const verifiedToken = jwt.verify(
       accessToken as string,
       process.env.JWT_SECRET!,
-    ) as JwtPayload;
+    ) as jwt.JwtPayload;
 
     const userRole: UserRole = verifiedToken.role;
-    const user = await getUserInfo();
 
+    const user = await getUserInfo();
+    // API Call
     const response = await serverFetch.post("/auth/reset-password", {
       body: JSON.stringify({
         id: user?.id,
@@ -109,7 +192,9 @@ export async function resetPassword(_prevState: any, formData: FormData) {
     if (!result.success) {
       throw new Error(result.message || "Reset password failed");
     }
+
     if (result.success) {
+      // await get
       revalidateTag("user-info", { expire: 0 });
     }
 

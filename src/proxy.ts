@@ -7,6 +7,7 @@ import {
   isAuthRoutes,
   UserRole,
 } from "./lib/auth-utils";
+import { getUserInfo } from "./services/auth/getUserInfo";
 
 export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
@@ -63,14 +64,37 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  //rule-3: user is trying to access common protected route
+  //rule-3: user need password change
+  if (accessToken) {
+    const userInfo = await getUserInfo();
+    if (userInfo.needPasswordChange) {
+      if (pathname !== "/reset-password") {
+        const resetPasswordUrl = new URL("/reset-password", request.url);
+        resetPasswordUrl.searchParams.set("redirect", pathname);
+        return NextResponse.redirect(resetPasswordUrl);
+      }
+      return NextResponse.next();
+    }
+
+    if (
+      userInfo &&
+      !userInfo.needPasswordChange &&
+      pathname === "/reset-password"
+    ) {
+      return NextResponse.redirect(
+        new URL(getDefaultDashboardRoute(userRole as UserRole), request.url),
+      );
+    }
+  }
+
+  //rule-4: user is trying to access common protected route
   if (routeOwner === "COMMON") {
     if (!accessToken) {
       return NextResponse.redirect(new URL("/login", request.url));
     }
   }
 
-  //rule-4: user is trying to access rule based protected route
+  //rule-5: user is trying to access rule based protected route
 
   if (
     routeOwner === "ADMIN" ||
