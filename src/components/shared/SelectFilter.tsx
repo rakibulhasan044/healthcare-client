@@ -15,6 +15,7 @@ import {
 interface SelectFilterProps {
   paramName: string;
   placeholder?: string;
+  defaultValue?: string;
   options: {
     label: string;
     value: string;
