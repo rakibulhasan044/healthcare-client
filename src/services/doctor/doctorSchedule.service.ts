@@ -1,3 +1,4 @@
+"use server";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { serverFetch } from "@/lib/server-fetch";
 
@@ -8,12 +9,12 @@ export async function getDoctorOwnSchedules(queryString?: string) {
     );
 
     const result = await response.json();
-
-    return {
-      success: result.success,
-      data: Array.isArray(result.data) ? result.dat : [],
-      meta: result.meta,
-    };
+    return result;
+    // return {
+    //   success: result.success,
+    //   data: Array.isArray(result.data) ? result.data : [],
+    //   meta: result.meta,
+    // };
   } catch (error: any) {
     console.log(error);
     return {
@@ -26,14 +27,13 @@ export async function getDoctorOwnSchedules(queryString?: string) {
 
 export async function getAvailableSchedules() {
   try {
-    const response = await serverFetch.get("schedule");
+    const response = await serverFetch.get("/schedule");
     const result = await response.json();
     return result;
   } catch (error: any) {
     console.log(error);
     return {
       success: false,
-      data: [],
       message: `${process.env.NODE_ENV === "development" ? error.message : "something went wrong"}`,
     };
   }
@@ -60,15 +60,15 @@ export async function createDoctorSchedule(scheduleIds: string[]) {
   }
 }
 
-export async function deleteDoctorOwnSchedules(scheduleId: string[]) {
+export async function deleteDoctorOwnSchedule(scheduleId: string) {
   try {
     const response = await serverFetch.delete(`/doctor-schedule/${scheduleId}`);
 
     const result = await response.json();
     return {
-        success: result.success,
-        message: result.message || "Schedule removed successfully"
-    }
+      success: result.success,
+      message: result.message || "Schedule removed successfully",
+    };
   } catch (error: any) {
     console.log(error);
     return {

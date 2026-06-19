@@ -54,8 +54,7 @@ export default function BookScheduleDialog({
     try {
       setLoadingSchedules(true);
       const response = await getAvailableSchedules();
-      console.log("response:", response);
-      setAvailableSchedules(response?.data || []);
+      setAvailableSchedules(response?.data.data || []);
     } catch (error) {
       console.error("Error loading schedules:", error);
       toast.error("Failed to load available schedules");
@@ -120,8 +119,6 @@ export default function BookScheduleDialog({
   };
 
   const groupedSchedules = groupSchedulesByDate();
-
-  console.log({ availableSchedules, groupedSchedules });
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
