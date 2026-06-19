@@ -4,7 +4,7 @@ import { serverFetch } from "@/lib/server-fetch";
 import { zodValidatorSchema } from "@/lib/zodvalidator";
 import { resetPasswordSchema } from "@/zod/authValidation";
 import { revalidateTag } from "next/cache";
-import { getCookie } from "./tokenHandler";
+import { deleteCookie, getCookie, setCookie } from "./tokenHandler";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import {
   getDefaultDashboardRoute,
@@ -13,6 +13,8 @@ import {
 } from "@/lib/auth-utils";
 import { getUserInfo } from "./getUserInfo";
 import { redirect } from "next/navigation";
+import { verifyAccessToken } from "@/lib/jwtHandlers";
+import { parse } from "cookie";
 
 export async function updateMyProfile(formData: FormData) {
   try {
@@ -170,7 +172,7 @@ export async function resetPassword(_prevState: any, formData: FormData) {
     const verifiedToken = jwt.verify(
       accessToken as string,
       process.env.JWT_SECRET!,
-    ) as jwt.JwtPayload;
+    ) as JwtPayload;
 
     const userRole: UserRole = verifiedToken.role;
 
@@ -219,4 +221,225 @@ export async function resetPassword(_prevState: any, formData: FormData) {
       formData: validationPayload,
     };
   }
+}
+
+// export async function getNewAccessToken() {
+//   try {
+//     const accessToken = await getCookie("accessToken");
+//     const refreshToken = await getCookie("refreshToken");
+
+//     //both access and refresh token is missing
+//     if (!accessToken && !refreshToken) {
+//       throw new Error("No tokens found");
+//     }
+
+//     //access token exit and need to verify
+//     if (accessToken) {
+//       const verifiedToken = await verifyAccessToken(accessToken);
+
+//       if (verifiedToken.success) {
+//         return {
+//           tokenRefreshed: false,
+//         };
+//       }
+//     }
+
+//     //case-3: refresh token is missing
+//     if (!refreshToken) {
+//       return {
+//         tokenRefresh: false,
+//       };
+//     }
+
+//     //case-4: access token is invalid or expired try to get access token using refresh token
+
+//     ///now its confirm accessToken is missing or invalid and refresh token exits
+//     //safe to call api
+
+//     let accessTokenTokenObject: null | any = null;
+//     let refreshTokenTokenObject: null | any = null;
+
+//     console.log('refresh check');
+//     const response = await serverFetch.post("/auth/refresh-token", {
+//       headers: {
+//         Cookie: `refreshToken=${refreshToken}`,
+//       },
+//     });
+
+//     const result = await response.json();
+//     console.log("access token refresh");
+
+//     const setCookieHeaders = response.headers.getSetCookie();
+
+//     if (setCookieHeaders && setCookieHeaders.length > 0) {
+//       setCookieHeaders.forEach((cookie: string) => {
+//         const parsedCookie = parse(cookie);
+
+//         if (parsedCookie["accessToken"]) {
+//           accessTokenTokenObject = parsedCookie;
+//         }
+
+//         if (parsedCookie["refreshToken"]) {
+//           refreshTokenTokenObject = parsedCookie;
+//         }
+//       });
+//     } else {
+//       throw new Error("No set-cookie header found");
+//     }
+//     if (!accessTokenTokenObject) {
+//       throw new Error("Tokens not found in cookie");
+//     }
+//     if (!refreshTokenTokenObject) {
+//       throw new Error("Tokens not found in cookie");
+//     }
+
+//     await deleteCookie("accessToken");
+//     await setCookie("accessToken", accessTokenTokenObject.accessToken, {
+//       secure: true,
+//       httpOnly: true,
+//       maxAge: parseInt(accessTokenTokenObject["Max-Age"]) || 1000 * 60 * 60,
+//       path: accessTokenTokenObject["SameSite"] || "none",
+//     });
+
+//     await deleteCookie("refreshToken");
+//     await setCookie("refreshToken", refreshTokenTokenObject.refreshToken, {
+//       secure: true,
+//       httpOnly: true,
+//       maxAge: parseInt(accessTokenTokenObject["Max-Age"]) || 1000 * 60 * 60 * 24 * 90,
+//       path: accessTokenTokenObject["SameSite"] || "none",
+//     });
+
+//     if (!result.success) {
+//       throw new Error(result?.message || "Token refresh failed");
+//     }
+
+//     return {
+//       tokenRefreshed: true,
+//       success: true,
+//       message: "Token refreshed successfully",
+//     };
+//   } catch (error: any) {
+//     return {
+//       tokenRefreshed: false,
+//       success: false,
+//       message: error?.message || "something went wrong",
+//     };
+//   }
+// }
+
+export async function getNewAccessToken() {
+    try {
+        const accessToken = await getCookie("accessToken");
+        const refreshToken = await getCookie("refreshToken");
+
+        //Case 1: Both tokens are missing - user is logged out
+        if (!accessToken && !refreshToken) {
+            return {
+                tokenRefreshed: false,
+            }
+        }
+
+        // Case 2 : Access Token exist- and need to verify
+        if (accessToken) {
+            const verifiedToken = await verifyAccessToken(accessToken);
+
+            if (verifiedToken.success) {
+                return {
+                    tokenRefreshed: false,
+                }
+            }
+        }
+
+        //Case 3 : refresh Token is missing- user is logged out
+        if (!refreshToken) {
+            return {
+                tokenRefreshed: false,
+            }
+        }
+
+        //Case 4: Access Token is invalid/expired- try to get a new one using refresh token
+        // This is the only case we need to call the API
+
+        // Now we know: accessToken is invalid/missing AND refreshToken exists
+        // Safe to call the API
+        let accessTokenObject: null | any = null;
+        let refreshTokenObject: null | any = null;
+
+        // API Call - serverFetch will skip getNewAccessToken for /auth/refresh-token endpoint
+        const response = await serverFetch.post("/auth/refresh-token", {
+            headers: {
+                Cookie: `refreshToken=${refreshToken}`,
+            },
+        });
+
+        const result = await response.json();
+
+        console.log("access token refreshed!!", result);
+
+        const setCookieHeaders = response.headers.getSetCookie();
+
+        if (setCookieHeaders && setCookieHeaders.length > 0) {
+            setCookieHeaders.forEach((cookie: string) => {
+                const parsedCookie = parse(cookie);
+
+                if (parsedCookie['accessToken']) {
+                    accessTokenObject = parsedCookie;
+                }
+                if (parsedCookie['refreshToken']) {
+                    refreshTokenObject = parsedCookie;
+                }
+            })
+        } else {
+            throw new Error("No Set-Cookie header found");
+        }
+
+        if (!accessTokenObject) {
+            throw new Error("Tokens not found in cookies");
+        }
+
+        if (!refreshTokenObject) {
+            throw new Error("Tokens not found in cookies");
+        }
+
+        await deleteCookie("accessToken");
+        await setCookie("accessToken", accessTokenObject.accessToken, {
+            secure: true,
+            httpOnly: true,
+            maxAge: parseInt(accessTokenObject['Max-Age']) || 1000 * 60 * 60,
+            path: accessTokenObject.Path || "/",
+            sameSite: accessTokenObject['SameSite'] || "none",
+        });
+
+        await deleteCookie("refreshToken");
+        await setCookie("refreshToken", refreshTokenObject.refreshToken, {
+            secure: true,
+            httpOnly: true,
+            maxAge: parseInt(refreshTokenObject['Max-Age']) || 1000 * 60 * 60 * 24 * 90,
+            path: refreshTokenObject.Path || "/",
+            sameSite: refreshTokenObject['SameSite'] || "none",
+        });
+
+        if (!result.success) {
+            throw new Error(result.message || "Token refresh failed");
+        }
+
+
+        console.log(accessToken, refreshToken);
+        return {
+            tokenRefreshed: true,
+            success: true,
+            message: "Token refreshed successfully"
+        };
+
+
+    } catch (error: any) {
+
+      console.log('error from last err');
+        return {
+            tokenRefreshed: false,
+            success: false,
+            message: error?.message || "Something went wrong",
+        };
+    }
+
 }

@@ -88,7 +88,7 @@ export const loginUser = async (
     });
     const verifiedToken: JwtPayload | string = jwt.verify(
       accessTokenObject.accessToken,
-      process.env.JWT_SECRET as string,
+      process.env.JWT_SECRET as Secret,
     );
 
     if (typeof verifiedToken === "string") {

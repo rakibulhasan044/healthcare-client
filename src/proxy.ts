@@ -1,6 +1,6 @@
+import jwt, { JwtPayload } from "jsonwebtoken";
+import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import { NextRequest } from "next/server";
-import jwt, { JwtPayload, Secret } from "jsonwebtoken";
 import {
   getDefaultDashboardRoute,
   getRouteOwner,
@@ -8,63 +8,82 @@ import {
   UserRole,
 } from "./lib/auth-utils";
 import { getUserInfo } from "./services/auth/getUserInfo";
+import { getNewAccessToken } from "./services/auth/auth.service";
+import { deleteCookie, getCookie } from "./services/auth/tokenHandler";
 
+// This function can be marked `async` if using `await` inside
 export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
-  const accessToken = request.cookies.get("accessToken")?.value || null;
+  const hasTokenRefreshedParam =
+    request.nextUrl.searchParams.has("tokenRefreshed");
+
+  // If coming back after token refresh, remove the param and continue
+  if (hasTokenRefreshedParam) {
+    const url = request.nextUrl.clone();
+    url.searchParams.delete("tokenRefreshed");
+    return NextResponse.redirect(url);
+  }
+
+  const tokenRefreshResult = await getNewAccessToken();
+
+  // If token was refreshed, redirect to same page to fetch with new token
+  if (tokenRefreshResult?.tokenRefreshed) {
+    const url = request.nextUrl.clone();
+    url.searchParams.set("tokenRefreshed", "true");
+    return NextResponse.redirect(url);
+  }
+
+  // const accessToken = request.cookies.get("accessToken")?.value || null;
+
+  const accessToken = (await getCookie("accessToken")) || null;
 
   let userRole: UserRole | null = null;
-
   if (accessToken) {
-    if (!process.env.JWT_SECRET) {
-      throw new Error("JWT_SECRET is not configured");
-    }
     try {
       const verifiedToken = jwt.verify(
         accessToken,
-        process.env.JWT_SECRET as Secret,
+        process.env.JWT_SECRET as string,
       ) as JwtPayload;
 
       userRole = verifiedToken.role;
-    } catch (error) {
-      console.error("JWT verification failed:", error);
-
-      const response = NextResponse.redirect(new URL("/login", request.url));
-
-      response.cookies.delete("accessToken");
-      response.cookies.delete("refreshToken");
-
-      return response;
+    } catch (err) {
+      console.log(err);
+      // Token is invalid or expired — clear cookies and force login
+      await deleteCookie("accessToken");
+      await deleteCookie("refreshToken");
+      return NextResponse.redirect(new URL("/login", request.url));
     }
   }
 
-  const routeOwner = getRouteOwner(pathname);
-
+  const routerOwner = getRouteOwner(pathname);
   //path = /doctor/appointments => "DOCTOR"
-  //path = /my-profile => "PATIENT"
+  //path = /my-profile => "COMMON"
+  //path = /login => null
 
   const isAuth = isAuthRoutes(pathname);
 
-  //rule-1: user is logged in and trying to access auth route
+  // Rule 1 : User is logged in and trying to access auth route. Redirect to default dashboard
   if (accessToken && isAuth) {
     return NextResponse.redirect(
       new URL(getDefaultDashboardRoute(userRole as UserRole), request.url),
     );
   }
 
-  //rule-2: user is trying to access public route
-  if (routeOwner === null) {
+  // Rule 2 : User is trying to access open public route
+  if (routerOwner === null) {
     return NextResponse.next();
   }
 
-  //rule 1 & 2 open for public and auth routes
+  // Rule 1 & 2 for open public routes and auth routes
+
   if (!accessToken) {
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("redirect", pathname);
     return NextResponse.redirect(loginUrl);
   }
 
-  //rule-3: user need password change
+  // Rule 3 : User need password change
+
   if (accessToken) {
     const userInfo = await getUserInfo();
     if (userInfo.needPasswordChange) {
@@ -87,26 +106,22 @@ export async function proxy(request: NextRequest) {
     }
   }
 
-  //rule-4: user is trying to access common protected route
-  if (routeOwner === "COMMON") {
-    if (!accessToken) {
-      return NextResponse.redirect(new URL("/login", request.url));
-    }
+  // Rule 4 : User is trying to access common protected route
+  if (routerOwner === "COMMON") {
+    return NextResponse.next();
   }
 
-  //rule-5: user is trying to access rule based protected route
-
+  // Rule 5 : User is trying to access role based protected route
   if (
-    routeOwner === "ADMIN" ||
-    routeOwner === "DOCTOR" ||
-    routeOwner === "PATIENT"
+    routerOwner === "ADMIN" ||
+    routerOwner === "DOCTOR" ||
+    routerOwner === "PATIENT"
   ) {
-    if (userRole !== routeOwner) {
+    if (userRole !== routerOwner) {
       return NextResponse.redirect(
         new URL(getDefaultDashboardRoute(userRole as UserRole), request.url),
       );
     }
-    return NextResponse.next();
   }
 
   return NextResponse.next();
