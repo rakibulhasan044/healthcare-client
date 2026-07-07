@@ -27,7 +27,9 @@ export const loginUser = async (
       password: formData.get("password"),
     };
 
-    if (zodValidatorSchema(payload, loginValidationZodSchema).success === false) {
+    if (
+      zodValidatorSchema(payload, loginValidationZodSchema).success === false
+    ) {
       return zodValidatorSchema(payload, loginValidationZodSchema);
     }
 

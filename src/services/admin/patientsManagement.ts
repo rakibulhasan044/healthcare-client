@@ -15,7 +15,6 @@ export async function getPatients(queryString?: string) {
       `/patient${queryString ? `?${queryString}` : ""}`,
     );
     const result = await response.json();
-    console.log("result ->",result);
     return result;
   } catch (error: any) {
     console.log(error);

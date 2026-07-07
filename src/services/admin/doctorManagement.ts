@@ -195,7 +195,7 @@ export async function updateDoctor(
   }
 
   console.log(validatedPayload, "validatedPayload");
-  console.log(validationPayload, 'validationPayload');
+  console.log(validationPayload, "validationPayload");
 
   try {
     const response = await serverFetch.patch(`/doctor/${id}`, {
