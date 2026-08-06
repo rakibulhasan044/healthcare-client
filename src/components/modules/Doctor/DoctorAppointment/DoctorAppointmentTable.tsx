@@ -4,11 +4,8 @@ import ManagementTable from "@/components/shared/ManagementTable";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
-import { doctorAppointmentColumns } from "./doctorAppointmentColumns";
-import {
-  AppointmentStatus,
-  IAppointment,
-} from "@/types/appointment.interface";
+import { doctorAppointmentColumns } from "./DoctorAppointmentColumns";
+import { AppointmentStatus, IAppointment } from "@/types/appointment.interface";
 import ChangeAppointmentStatusDialog from "./ChangeAppointmentStatusDialog";
 import DoctorAppointmentDetailDialog from "./DoctorAppointmentDetailDialog";
 

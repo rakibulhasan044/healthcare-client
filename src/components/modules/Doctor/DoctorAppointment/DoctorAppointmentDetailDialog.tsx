@@ -51,7 +51,7 @@ export default function DoctorAppointmentDetailDialog({
 
     if (instructions.trim().length < 20) {
       toast.error(
-        "Instructions must be at least 20 characters long for clarity"
+        "Instructions must be at least 20 characters long for clarity",
       );
       return;
     }
@@ -152,7 +152,7 @@ export default function DoctorAppointmentDetailDialog({
                   {schedule?.startDateTime && schedule?.endDateTime
                     ? `${format(
                         new Date(schedule.startDateTime),
-                        "p"
+                        "p",
                       )} - ${format(new Date(schedule.endDateTime), "p")}`
                     : "N/A"}
                 </p>
@@ -166,10 +166,10 @@ export default function DoctorAppointmentDetailDialog({
                       status === "COMPLETED"
                         ? "border-green-500 text-green-700 bg-green-50"
                         : status === "INPROGRESS"
-                        ? "border-blue-500 text-blue-700 bg-blue-50"
-                        : status === "SCHEDULED"
-                        ? "border-purple-500 text-purple-700 bg-purple-50"
-                        : "border-red-500 text-red-700 bg-red-50"
+                          ? "border-blue-500 text-blue-700 bg-blue-50"
+                          : status === "SCHEDULED"
+                            ? "border-purple-500 text-purple-700 bg-purple-50"
+                            : "border-red-500 text-red-700 bg-red-50"
                     }
                   >
                     {status}
