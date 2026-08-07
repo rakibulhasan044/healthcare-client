@@ -16,8 +16,6 @@ const AppointmentsManagementPage = async ({
   const queryString = queryStringFormatter(searchParamsObj);
   const response = await getAppointments(queryString);
 
-  console.log(response);
-
   return (
     <div className="space-y-6">
       <ManagementPageHeader
@@ -28,7 +26,7 @@ const AppointmentsManagementPage = async ({
       <AppointmentsFilter />
 
       <Suspense fallback={<TableSkeleton columns={7} />}>
-        <AppointmentsTable appointments={response?.data || []} />
+        <AppointmentsTable appointments={response?.data?.data || []} />
       </Suspense>
 
       <TablePagination

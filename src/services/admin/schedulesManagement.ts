@@ -18,23 +18,6 @@ export async function createSchedule(_prevState: any, formData: FormData) {
     endTime: formData.get("endTime") as string,
   };
 
-  /*
-    // Server-side validation
-        const validation = createScheduleZodSchema.safeParse(validationPayload);
-        if (!validation.success) {
-            const errors = validation.error.issues.map((err: any) => ({
-                field: err.path[0] as string,
-                message: err.message,
-            }));
-            return {
-                success: false,
-                message: "Validation failed",
-                formData: validationPayload,
-                errors,
-            };
-        }
-    */
-
   const validation = zodValidatorSchema(
     validationPayload,
     createScheduleZodSchema,

@@ -2,7 +2,10 @@
 "use server";
 import { serverFetch } from "@/lib/server-fetch";
 import { zodValidatorSchema } from "@/lib/zodvalidator";
-import { resetPasswordSchema } from "@/zod/authValidation";
+import {
+  changePasswordSchema,
+  resetPasswordSchema,
+} from "@/zod/authValidation";
 import { revalidateTag } from "next/cache";
 import { deleteCookie, getCookie, setCookie } from "./tokenHandler";
 import jwt, { JwtPayload } from "jsonwebtoken";
@@ -55,88 +58,6 @@ export async function updateMyProfile(formData: FormData) {
     };
   }
 }
-
-// export async function resetPassword(_prevState: any, formData: FormData) {
-//   const redirectTo = formData.get("redirect") || null;
-
-//   //build validation payload
-//   const validationPayload = {
-//     newPassword: formData.get("newPassword"),
-//     confirmPassword: formData.get("confirmPassword"),
-//   };
-
-//   //validate
-//   const validatedPayload = zodValidatorSchema(
-//     validationPayload,
-//     resetPasswordSchema,
-//   );
-
-//   if (!validatedPayload.success && validatedPayload.errors) {
-//     return {
-//       success: false,
-//       message: "Validation failed",
-//       formData: validationPayload,
-//       errors: validatedPayload.errors,
-//     };
-//   }
-
-//   try {
-//     const accessToken = await getCookie("accessToken");
-
-//     if (!accessToken) {
-//       throw new Error("User not authenticated");
-//     }
-
-//     const verifiedToken = jwt.verify(
-//       accessToken as string,
-//       process.env.JWT_SECRET!,
-//     ) as JwtPayload;
-
-//     const userRole: UserRole = verifiedToken.role;
-//     const user = await getUserInfo();
-
-//     const response = await serverFetch.post("/auth/reset-password", {
-//       body: JSON.stringify({
-//         id: user?.id,
-//         password: validationPayload.newPassword,
-//       }),
-//       headers: {
-//         Authorization: accessToken,
-//         "Content-Type": "application/json",
-//       },
-//     });
-
-//     const result = await response.json();
-
-//     if (!result.success) {
-//       throw new Error(result.message || "Reset password failed");
-//     }
-//     if (result.success) {
-//       revalidateTag("user-info", { expire: 0 });
-//     }
-
-//     if (redirectTo) {
-//       const requestedPath = redirectTo.toString();
-//       if (isValidRedirectForRole(requestedPath, userRole)) {
-//         redirect(`${requestedPath}?loggedIn=true`);
-//       } else {
-//         redirect(`${getDefaultDashboardRoute(userRole)}?loggedIn=true`);
-//       }
-//     } else {
-//       redirect(`${getDefaultDashboardRoute(userRole)}?loggedIn=true`);
-//     }
-//   } catch (error: any) {
-//     // Re-throw NEXT_REDIRECT errors so Next.js can handle them
-//     if (error?.digest?.startsWith("NEXT_REDIRECT")) {
-//       throw error;
-//     }
-//     return {
-//       success: false,
-//       message: error?.message || "Something went wrong",
-//       formData: validationPayload,
-//     };
-//   }
-// }
 
 export async function resetPassword(_prevState: any, formData: FormData) {
   const redirectTo = formData.get("redirect") || null;
@@ -222,110 +143,6 @@ export async function resetPassword(_prevState: any, formData: FormData) {
     };
   }
 }
-
-// export async function getNewAccessToken() {
-//   try {
-//     const accessToken = await getCookie("accessToken");
-//     const refreshToken = await getCookie("refreshToken");
-
-//     //both access and refresh token is missing
-//     if (!accessToken && !refreshToken) {
-//       throw new Error("No tokens found");
-//     }
-
-//     //access token exit and need to verify
-//     if (accessToken) {
-//       const verifiedToken = await verifyAccessToken(accessToken);
-
-//       if (verifiedToken.success) {
-//         return {
-//           tokenRefreshed: false,
-//         };
-//       }
-//     }
-
-//     //case-3: refresh token is missing
-//     if (!refreshToken) {
-//       return {
-//         tokenRefresh: false,
-//       };
-//     }
-
-//     //case-4: access token is invalid or expired try to get access token using refresh token
-
-//     ///now its confirm accessToken is missing or invalid and refresh token exits
-//     //safe to call api
-
-//     let accessTokenTokenObject: null | any = null;
-//     let refreshTokenTokenObject: null | any = null;
-
-//     console.log('refresh check');
-//     const response = await serverFetch.post("/auth/refresh-token", {
-//       headers: {
-//         Cookie: `refreshToken=${refreshToken}`,
-//       },
-//     });
-
-//     const result = await response.json();
-//     console.log("access token refresh");
-
-//     const setCookieHeaders = response.headers.getSetCookie();
-
-//     if (setCookieHeaders && setCookieHeaders.length > 0) {
-//       setCookieHeaders.forEach((cookie: string) => {
-//         const parsedCookie = parse(cookie);
-
-//         if (parsedCookie["accessToken"]) {
-//           accessTokenTokenObject = parsedCookie;
-//         }
-
-//         if (parsedCookie["refreshToken"]) {
-//           refreshTokenTokenObject = parsedCookie;
-//         }
-//       });
-//     } else {
-//       throw new Error("No set-cookie header found");
-//     }
-//     if (!accessTokenTokenObject) {
-//       throw new Error("Tokens not found in cookie");
-//     }
-//     if (!refreshTokenTokenObject) {
-//       throw new Error("Tokens not found in cookie");
-//     }
-
-//     await deleteCookie("accessToken");
-//     await setCookie("accessToken", accessTokenTokenObject.accessToken, {
-//       secure: true,
-//       httpOnly: true,
-//       maxAge: parseInt(accessTokenTokenObject["Max-Age"]) || 1000 * 60 * 60,
-//       path: accessTokenTokenObject["SameSite"] || "none",
-//     });
-
-//     await deleteCookie("refreshToken");
-//     await setCookie("refreshToken", refreshTokenTokenObject.refreshToken, {
-//       secure: true,
-//       httpOnly: true,
-//       maxAge: parseInt(accessTokenTokenObject["Max-Age"]) || 1000 * 60 * 60 * 24 * 90,
-//       path: accessTokenTokenObject["SameSite"] || "none",
-//     });
-
-//     if (!result.success) {
-//       throw new Error(result?.message || "Token refresh failed");
-//     }
-
-//     return {
-//       tokenRefreshed: true,
-//       success: true,
-//       message: "Token refreshed successfully",
-//     };
-//   } catch (error: any) {
-//     return {
-//       tokenRefreshed: false,
-//       success: false,
-//       message: error?.message || "something went wrong",
-//     };
-//   }
-// }
 
 export async function getNewAccessToken() {
   try {
@@ -436,6 +253,58 @@ export async function getNewAccessToken() {
       tokenRefreshed: false,
       success: false,
       message: error?.message || "Something went wrong",
+    };
+  }
+}
+
+export async function changePassword(_prevState: any, formData: FormData) {
+  const validationPayload = {
+    oldPassword: formData.get("oldPassword") as string,
+    newPassword: formData.get("newPassword") as string,
+    confirmPassword: formData.get("confirmPassword") as string,
+  };
+
+  const validatedPayload = zodValidatorSchema(
+    validationPayload,
+    changePasswordSchema,
+  );
+
+  if (!validatedPayload.success && validatedPayload.errors) {
+    return {
+      success: false,
+      message: "Validation failed",
+      formData: validationPayload,
+      errors: validatedPayload.errors,
+    };
+  }
+
+  try {
+    const response = await serverFetch.post("/auth/change-password", {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        oldPassword: validationPayload.oldPassword,
+        newPassword: validationPayload.newPassword,
+      }),
+    });
+
+    const result = await response.json();
+
+    if (!result.success) {
+      throw new Error(result.message || "Password change failed");
+    }
+
+    console.log(result);
+    return {
+      success: true,
+      message: result.message || "Password changed successfully",
+    };
+  } catch (error: any) {
+    return {
+      success: false,
+      message: error?.message || "Something went wrong!",
+      formData: validationPayload,
     };
   }
 }
