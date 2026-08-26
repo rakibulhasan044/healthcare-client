@@ -9,12 +9,12 @@ export async function getDoctorOwnSchedules(queryString?: string) {
     );
 
     const result = await response.json();
-    return result;
-    // return {
-    //   success: result.success,
-    //   data: Array.isArray(result.data) ? result.data : [],
-    //   meta: result.meta,
-    // };
+    // return result;
+    return {
+      success: result.success,
+      data: Array.isArray(result.data) ? result.data.data: [],
+      meta: result.meta,
+    };
   } catch (error: any) {
     console.log(error);
     return {

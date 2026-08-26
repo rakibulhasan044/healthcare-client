@@ -14,9 +14,9 @@ export interface IDoctor {
   qualification: string;
   currentWorkingPlace: string;
   designation: string;
-  specialties: string[];
-  removeSpecialties?: string[];
+  specialties?: string[];
   profilePhoto?: File | string;
+  removeSpecialties?: string[];
   isDeleted?: boolean;
   averageRating?: number;
   createdAt?: string;
@@ -29,5 +29,6 @@ export interface IDoctor {
       icon?: string;
     };
   }>;
+
   doctorSchedules?: IDoctorSchedule[];
 }
