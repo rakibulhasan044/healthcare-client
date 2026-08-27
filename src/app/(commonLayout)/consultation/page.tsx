@@ -6,6 +6,7 @@ import { TableSkeleton } from "@/components/shared/TableSkeleton";
 import { queryStringFormatter } from "@/lib/formatters";
 import { getDoctors } from "@/services/admin/doctorManagement";
 import { getSpecialties } from "@/services/admin/specialtiesManagement";
+import { getUserInfo } from "@/services/auth/getUserInfo";
 import { Suspense } from "react";
 
 // ISR: Revalidate every 10 minutes for doctor listings
@@ -20,13 +21,15 @@ const ConsultationPage = async ({
   const queryString = queryStringFormatter(searchParamsObj);
 
   // Fetch doctors and specialties in parallel
-  const [doctorsResponse, specialtiesResponse] = await Promise.all([
+  const [doctorsResponse, specialtiesResponse, userInfo] = await Promise.all([
     getDoctors(queryString),
     getSpecialties(),
+    getUserInfo()
   ]);
 
   const doctors = doctorsResponse?.data || [];
   const specialties = specialtiesResponse?.data || [];
+  const isLoggedIn = !!userInfo?.id;
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -48,7 +51,7 @@ const ConsultationPage = async ({
 
         {/* Doctor Grid */}
         <Suspense fallback={<TableSkeleton columns={3} />}>
-          <DoctorGrid doctors={doctors} />
+          <DoctorGrid doctors={doctors} isLoggedIn={isLoggedIn} />
         </Suspense>
 
         {/* Pagination */}

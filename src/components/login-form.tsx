@@ -90,14 +90,6 @@ const LoginForm = ({ redirect }: { redirect?: string }) => {
                   Register here
                 </a>
               </FieldDescription>
-              <FieldDescription className="px-6 text-center">
-                <a
-                  href="/forgot-password"
-                  className="text-blue-600 hover:underline"
-                >
-                  Forgot Password
-                </a>
-              </FieldDescription>
             </Field>
           </motion.div>
         </FieldGroup>

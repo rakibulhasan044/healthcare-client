@@ -4,12 +4,16 @@ import { getTopRatedDoctors } from "@/services/doctor/doctor.service";
 import { IDoctor } from "@/types/doctor.interface";
 import { FadeUp } from "@/components/shared/Animations";
 import DoctorsGrid from "./DoctorsGrid";
+import { getUserInfo } from "@/services/auth/getUserInfo";
 
 const TopRatedDoctors = async () => {
   const response = await getTopRatedDoctors(6);
   const doctors: IDoctor[] = Array.isArray(response?.data)
     ? response.data
     : response?.data?.data || [];
+
+  const userInfo = await getUserInfo();
+  const isLoggedIn = !!userInfo?.id;
 
   return (
     <section className="bg-gradient-to-b from-blue-50/60 to-white py-24">
@@ -35,7 +39,7 @@ const TopRatedDoctors = async () => {
             No doctors available at the moment.
           </p>
         ) : (
-          <DoctorsGrid doctors={doctors} />
+          <DoctorsGrid doctors={doctors} isLoggedIn={isLoggedIn} />
         )}
 
         <FadeUp delay={0.2}>

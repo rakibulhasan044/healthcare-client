@@ -15,16 +15,26 @@ import { IDoctor } from "@/types/doctor.interface";
 import { Clock, DollarSign, Eye, MapPin, Star } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import BookAppointmentDialog from "./BookAppointmentDialog";
 import { HoverCard } from "@/components/shared/Animations";
 
-interface DoctorCard {
+interface DoctorCardProps {
   doctor: IDoctor;
+  isLoggedIn?: boolean;
 }
 
-export default function DoctorCard({ doctor }: DoctorCard) {
-  console.log(doctor);
+export default function DoctorCard({ doctor, isLoggedIn }: DoctorCardProps) {
+  const router = useRouter();
   const [showScheduleModal, setShowScheduleModal] = useState(false);
+
+  const handleBookAppointment = () => {
+    if (isLoggedIn) {
+      setShowScheduleModal(true);
+    } else {
+      router.push("/login");
+    }
+  };
 
   return (
     <>
@@ -121,7 +131,7 @@ export default function DoctorCard({ doctor }: DoctorCard) {
               <Eye className="h-4 w-4 mr-2" />
               View Details
             </Link>
-            <Button onClick={() => setShowScheduleModal(true)} className="flex-1">
+            <Button onClick={handleBookAppointment} className="flex-1">
               Book Appointment
             </Button>
           </CardFooter>

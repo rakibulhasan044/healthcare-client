@@ -5,9 +5,10 @@ import { StaggerContainer, StaggerItem } from "@/components/shared/Animations";
 
 interface DoctorGridProps {
   doctors: IDoctor[];
+  isLoggedIn?: boolean;
 }
 
-export const DoctorGrid = ({ doctors }: DoctorGridProps) => {
+export const DoctorGrid = ({ doctors, isLoggedIn }: DoctorGridProps) => {
 
   // console.log("consultation page ", doctors);
   if (doctors.length === 0) {
@@ -26,7 +27,7 @@ export const DoctorGrid = ({ doctors }: DoctorGridProps) => {
     <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {doctors.map((doctor) => (
         <StaggerItem key={doctor.id}>
-          <DoctorCard doctor={doctor} />
+          <DoctorCard doctor={doctor} isLoggedIn={isLoggedIn} />
         </StaggerItem>
       ))}
     </StaggerContainer>

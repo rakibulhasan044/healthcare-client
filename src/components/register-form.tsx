@@ -102,7 +102,7 @@ const RegisterForm = () => {
             </Field>
           </motion.div>
           {/* Confirm Password */}
-          <motion.div className="md:col-span-2" variants={itemVariants}>
+          <motion.div variants={itemVariants}>
             <Field>
               <FieldLabel htmlFor="confirmPassword">Confirm Password</FieldLabel>
               <Input
