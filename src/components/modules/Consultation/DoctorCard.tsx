@@ -1,7 +1,7 @@
 "use client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -22,6 +22,7 @@ interface DoctorCard {
 }
 
 export default function DoctorCard({ doctor }: DoctorCard) {
+  console.log(doctor);
   const [showScheduleModal, setShowScheduleModal] = useState(false);
 
   return (
@@ -111,11 +112,12 @@ export default function DoctorCard({ doctor }: DoctorCard) {
         </CardContent>
 
         <CardFooter className="pt-3 border-t flex gap-2">
-          <Link className="flex-1" href={`/consultation/doctor/${doctor.id}`}>
-            <Button variant="outline" className="w-full">
-              <Eye className="h-4 w-4 mr-2" />
-              View Details
-            </Button>
+          <Link
+            className={buttonVariants({ variant: "outline", className: "flex-1 w-full" })}
+            href={`/consultation/doctor/${doctor.id}`}
+          >
+            <Eye className="h-4 w-4 mr-2" />
+            View Details
           </Link>
           <Button onClick={() => setShowScheduleModal(true)} className="flex-1">
             Book Appointment

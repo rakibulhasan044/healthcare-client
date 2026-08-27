@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Button } from "../ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "../ui/sheet";
 import { Menu } from "lucide-react";
 import { getCookie } from "@/services/auth/tokenHandler";
 import LogoutButton from "./LogoutButton";
@@ -11,6 +11,7 @@ const PublicNavbar = async () => {
     { name: "Consultation", href: "/consultation" },
     { name: "Health Plans", href: "/health-plans" },
     { name: "Diagnostics", href: "/diagnostics" },
+    { name: "Medicine", href: "/medicine" },
     { name: "NGOs", href: "/ngos" },
   ];
 
@@ -55,6 +56,7 @@ const PublicNavbar = async () => {
               <Menu />
             </SheetTrigger>
             <SheetContent side="right" className="w-75 sm:w-100 px-4">
+              <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
               <nav className="">
                 <ul className=" flex flex-col font-bold space-y-4 mt-8">
                   {navItems.map((item) => (

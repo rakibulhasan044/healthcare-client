@@ -6,6 +6,8 @@ interface DoctorGridProps {
 }
 
 export const DoctorGrid = ({ doctors }: DoctorGridProps) => {
+
+  // console.log("consultation page ", doctors);
   if (doctors.length === 0) {
     return (
       <div className="text-center py-12">

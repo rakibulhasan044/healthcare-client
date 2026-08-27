@@ -30,7 +30,6 @@ export default function BookAppointmentDialog({
 }: BookAppointmentDialogProps) {
   const router = useRouter();
   const doctorSchedules = doctor.doctorSchedules || [];
-  console.log(doctorSchedules);
   const [selectedSchedule, setSelectedSchedule] =
     useState<IDoctorSchedule | null>(null);
 
@@ -69,7 +68,7 @@ export default function BookAppointmentDialog({
   const handleContinue = () => {
     if (selectedSchedule) {
       router.push(
-        `/dashboard/book-appointment/${doctor.id}/${selectedSchedule.scheduleId}`
+        `/dashboard/book-appointment/${doctor.id}/${selectedSchedule.scheduleId}`,
       );
     }
   };

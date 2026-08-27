@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { AlertCircle, ArrowLeft, Home } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -49,21 +49,13 @@ export default function NotFound() {
               <ArrowLeft className="h-4 w-4" />
               Go Back
             </Button>
-            <Button
-              size="lg"
-              className="gap-2"
-              render={
-                <Link href="/">
-                  <Home className="h-4 w-4" />
-                  Back to Home
-                </Link>
-              }
+            <Link
+              href="/"
+              className={buttonVariants({ size: "lg", className: "gap-2" })}
             >
-              {/* <Link href="/">
-                <Home className="h-4 w-4" />
-                Back to Home
-              </Link> */}
-            </Button>
+              <Home className="h-4 w-4" />
+              Back to Home
+            </Link>
           </div>
           {/* Decorative Elements */}
           <div className="absolute top-1/4 left-1/4 h-64 w-64 rounded-full bg-primary/5 blur-3xl glow-1" />
