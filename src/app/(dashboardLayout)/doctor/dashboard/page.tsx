@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getDashboardMetaData } from "@/services/meta/dashboard.service";
 import { Activity, CreditCard, Star, Users } from "lucide-react";

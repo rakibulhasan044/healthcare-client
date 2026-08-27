@@ -18,7 +18,7 @@ export default function NotFound() {
           <motion.div
             initial={{ scale: 0.5, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            transition={{ type: "spring", stiffness: 260, damping: 18, delay: 0.1 }}
+            transition={{ type: "spring" as const, stiffness: 260, damping: 18, delay: 0.1 }}
           >
             <div className="relative">
               <div className="absolute inset-0 rounded-full bg-destructive/10 pulse-scale" />
@@ -29,7 +29,7 @@ export default function NotFound() {
                 className="absolute -top-4 -right-4 rounded-full bg-destructive p-3 text-destructive-foreground shadow-lg"
                 initial={{ scale: 0, rotate: -30 }}
                 animate={{ scale: 1, rotate: 0 }}
-                transition={{ type: "spring", stiffness: 300, damping: 15, delay: 0.4 }}
+                transition={{ type: "spring" as const, stiffness: 300, damping: 15, delay: 0.4 }}
               >
                 <AlertCircle className="h-8 w-8" />
               </motion.div>
