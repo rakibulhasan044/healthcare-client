@@ -1,9 +1,12 @@
+"use client";
+
 import { Search, Calendar, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { LargeSparkleIcon, SparkleIcon } from "@/assets/icons/SparkleIcon";
 import { HeroProps } from "@/types/heroPros";
+import { motion } from "framer-motion";
 
 export function Hero({
   badge = {
@@ -53,21 +56,13 @@ export function Hero({
       "✨ Powered by advanced AI algorithms for accurate doctor matching",
   },
 }: HeroProps) {
-  //   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-  //     e.preventDefault();
-  //     const formData = new FormData(e.currentTarget);
-  //     const data = {
-  //       symptoms: formData.get('symptoms') as string,
-  //       specialty: formData.get('specialty') as string,
-  //     };
-  //     formCard.onSubmit?.(data);
-  //   };
+  const ease = [0.21, 0.47, 0.32, 0.98] as const;
 
   return (
     <div className="w-full relative">
       {/* Radial Gradient Background from Bottom */}
       <div
-        className="absolute inset-0 z-0 "
+        className="absolute inset-0 z-0"
         style={{
           background:
             "radial-gradient(125% 125% at 50% 90%, #fff 30%, #155DFC 100%)",
@@ -80,28 +75,57 @@ export function Hero({
             {/* Left Column - Hero Content */}
             <div className="flex flex-col justify-center space-y-6">
               {/* Badge */}
-              <div className="inline-flex items-center gap-3 self-start rounded-full bg-white px-4 py-2">
+              <motion.div
+                className="inline-flex items-center gap-3 self-start rounded-full bg-white px-4 py-2"
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, ease }}
+              >
                 <SparkleIcon />
                 <span className="text-[11.9px] font-medium text-blue-700">
                   {badge.text}
                 </span>
-              </div>
+              </motion.div>
 
               {/* Heading */}
               <div className="space-y-2">
-                <h1 className="text-[51px] leading-[60px]">{heading.line1}</h1>
-                <h1 className="text-[51px] leading-[60px]">{heading.line2}</h1>
+                <motion.h1
+                  className="text-[51px] leading-[60px]"
+                  initial={{ opacity: 0, x: -40 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.6, delay: 0.1, ease }}
+                >
+                  {heading.line1}
+                </motion.h1>
+                <motion.h1
+                  className="text-[51px] leading-[60px]"
+                  initial={{ opacity: 0, x: -40 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.6, delay: 0.2, ease }}
+                >
+                  {heading.line2}
+                </motion.h1>
               </div>
 
               {/* Description */}
-              <div className="space-y-1 text-[17px] leading-7 text-gray-600">
+              <motion.div
+                className="space-y-1 text-[17px] leading-7 text-gray-600"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.3, ease }}
+              >
                 {description.map((line, index) => (
                   <p key={index}>{line}</p>
                 ))}
-              </div>
+              </motion.div>
 
               {/* Buttons */}
-              <div className="flex flex-col gap-4 sm:flex-row">
+              <motion.div
+                className="flex flex-col gap-4 sm:flex-row"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.4, ease }}
+              >
                 {buttons.primary && (
                   <Button
                     onClick={buttons.primary.onClick}
@@ -121,10 +145,15 @@ export function Hero({
                     {buttons.secondary.text}
                   </Button>
                 )}
-              </div>
+              </motion.div>
 
               {/* Stats */}
-              <div className="grid grid-cols-3 gap-4 pt-4">
+              <motion.div
+                className="grid grid-cols-3 gap-4 pt-4"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.5, ease }}
+              >
                 {stats.map((stat, index) => (
                   <div key={index} className="space-y-2">
                     <div className="flex items-center gap-2">
@@ -136,11 +165,16 @@ export function Hero({
                     </p>
                   </div>
                 ))}
-              </div>
+              </motion.div>
             </div>
 
             {/* Right Column - Form Card */}
-            <div className="flex items-center justify-center lg:justify-end">
+            <motion.div
+              className="flex items-center justify-center lg:justify-end"
+              initial={{ opacity: 0, x: 60 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.7, delay: 0.2, ease }}
+            >
               <div className="w-full max-w-[559.929px] rounded-2xl bg-white p-8 shadow-[0px_25px_50px_-12px_rgba(0,0,0,0.25)]">
                 {/* Card Header */}
                 <div className="mb-6 flex items-center justify-between">
@@ -182,7 +216,7 @@ export function Hero({
                   </p>
                 </div>
               </div>
-            </div>
+            </motion.div>
           </div>
         </div>
       </div>

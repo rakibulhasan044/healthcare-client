@@ -27,7 +27,7 @@ const DashboardSidebarContent = ({
       {/* Logo/Brand */}
       <div className="flex h-16 items-center border-b px-6">
         <Link href={dashboardHome} className="flex items-center space-x-2">
-          <span className="text-xl font-bold text-primary">PH Healthcare</span>
+          <span className="text-xl font-bold text-primary">BookMyDoc</span>
         </Link>
       </div>
 
@@ -78,6 +78,31 @@ const DashboardSidebarContent = ({
           ))}
         </nav>
       </ScrollArea>
+
+      {/* Go to Home Link */}
+      <div className="border-t p-4">
+        <Link
+          href="/"
+          className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-all hover:bg-accent hover:text-accent-foreground"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="h-4 w-4"
+          >
+            <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+            <polyline points="9 22 9 12 15 12 15 22" />
+          </svg>
+          <span className="flex-1">Go to Home</span>
+        </Link>
+      </div>
 
       {/* User Info at Bottom */}
       <div className="border-t p-4">

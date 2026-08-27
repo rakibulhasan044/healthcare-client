@@ -27,6 +27,8 @@ import {
 } from "../ui/dropdown-menu";
 import { Button } from "../ui/button";
 import { useRouter, useSearchParams } from "next/navigation";
+import { FadeIn } from "@/components/shared/Animations";
+import { motion } from "framer-motion";
 
 export interface Column<T> {
   header: string;
@@ -96,8 +98,11 @@ function ManagementTable<T>({
     );
   };
 
+  // Ensure TableRow receives the forwarded ref from motion
+  const MotionTableRow = motion.create(TableRow);
+
   return (
-    <>
+    <FadeIn delay={0.1}>
       <div className="rounded-lg border relative">
         {/* Refreshing Overlay */}
         {isRefreshing && (
@@ -143,8 +148,13 @@ function ManagementTable<T>({
                 </TableCell>
               </TableRow>
             ) : (
-              data?.map((item) => (
-                <TableRow key={getRowKey(item)}>
+              data?.map((item, index) => (
+                <MotionTableRow
+                  key={getRowKey(item)}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.04 }}
+                >
                   {columns.map((col, idx) => (
                     <TableCell key={idx} className={col.className}>
                       {typeof col.accessor === "function"
@@ -188,13 +198,13 @@ function ManagementTable<T>({
                       </DropdownMenu>
                     </TableCell>
                   )}
-                </TableRow>
+                </MotionTableRow>
               ))
             )}
           </TableBody>
         </Table>
       </div>
-    </>
+    </FadeIn>
   );
 }
 

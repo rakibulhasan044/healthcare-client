@@ -104,7 +104,7 @@ const AppointmentDetails = ({ appointment }: AppointmentDetailProps) => {
 
   const getStatusBadge = (status: AppointmentStatus) => {
     const statusConfig: Record<
-      AppointmentStatus,
+      string,
       { variant: any; label: string; className?: string }
     > = {
       [AppointmentStatus.SCHEDULED]: {
@@ -112,7 +112,16 @@ const AppointmentDetails = ({ appointment }: AppointmentDetailProps) => {
         label: "Scheduled",
         className: "bg-blue-500 hover:bg-blue-600",
       },
+      "SCHEDULE": {
+        variant: "default",
+        label: "Scheduled",
+        className: "bg-blue-500 hover:bg-blue-600",
+      },
       [AppointmentStatus.INPROGRESS]: {
+        variant: "secondary",
+        label: "In Progress",
+      },
+      "IN_PROGRESS": {
         variant: "secondary",
         label: "In Progress",
       },
@@ -128,6 +137,13 @@ const AppointmentDetails = ({ appointment }: AppointmentDetailProps) => {
     };
 
     const config = statusConfig[status];
+    if (!config) {
+      return (
+        <Badge variant="outline" className="bg-gray-100 text-gray-800">
+          {status || "Unknown"}
+        </Badge>
+      );
+    }
     return (
       <Badge variant={config.variant} className={config.className}>
         {config.label}

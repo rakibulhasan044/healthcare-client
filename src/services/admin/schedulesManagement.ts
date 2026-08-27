@@ -4,6 +4,7 @@
 import { serverFetch } from "@/lib/server-fetch";
 import { zodValidatorSchema } from "@/lib/zodvalidator";
 import { createScheduleZodSchema } from "@/zod/schedule.validation";
+import { revalidatePath } from "next/cache";
 
 /**
  * CREATE SCHEDULE
@@ -47,6 +48,9 @@ export async function createSchedule(_prevState: any, formData: FormData) {
     });
 
     const result = await response.json();
+    if (result.success) {
+      revalidatePath("/admin/dashboard/schedules-management");
+    }
     return result;
   } catch (error: any) {
     console.error("Create schedule error:", error);
@@ -69,6 +73,7 @@ export async function getSchedules(queryString?: string) {
   try {
     const response = await serverFetch.get(
       `/schedule${queryString ? `?${queryString}` : ""}`,
+      { cache: "no-store" }
     );
     const result = await response.json();
     return result;
@@ -107,6 +112,9 @@ export async function deleteSchedule(id: string) {
   try {
     const response = await serverFetch.delete(`/schedule/${id}`);
     const result = await response.json();
+    if (result.success) {
+      revalidatePath("/admin/dashboard/schedules-management");
+    }
     return result;
   } catch (error: any) {
     console.log(error);

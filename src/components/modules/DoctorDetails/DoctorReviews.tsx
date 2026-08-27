@@ -7,6 +7,7 @@ import { getReviews } from "@/services/patient/reviews.services";
 import { format } from "date-fns";
 import { Star, User } from "lucide-react";
 import { useEffect, useState } from "react";
+import { FadeUp, StaggerContainer, StaggerItem } from "@/components/shared/Animations";
 
 interface Review {
   id: string;
@@ -72,80 +73,83 @@ export default function DoctorReviews({ doctorId }: DoctorReviewsProps) {
 
   if (loading) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Patient Reviews</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground">Loading reviews...</p>
-        </CardContent>
-      </Card>
+      <FadeUp>
+        <Card>
+          <CardHeader>
+            <CardTitle>Patient Reviews</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground">Loading reviews...</p>
+          </CardContent>
+        </Card>
+      </FadeUp>
     );
   }
 
   return (
     <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle>Patient Reviews</CardTitle>
-          {stats.totalReviews > 0 && (
-            <div className="flex items-center gap-2">
-              <div className="flex items-center gap-1">
-                {renderStars(Math.round(stats.averageRating))}
+      <FadeUp>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle>Patient Reviews</CardTitle>
+            {stats.totalReviews > 0 && (
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1">
+                  {renderStars(Math.round(stats.averageRating))}
+                </div>
+                <span className="font-semibold">
+                  {stats.averageRating.toFixed(1)}
+                </span>
+                <Badge variant="secondary">{stats.totalReviews} reviews</Badge>
               </div>
-              <span className="font-semibold">
-                {stats.averageRating.toFixed(1)}
-              </span>
-              <Badge variant="secondary">{stats.totalReviews} reviews</Badge>
-            </div>
-          )}
-        </div>
-      </CardHeader>
+            )}
+          </div>
+        </CardHeader>
+      </FadeUp>
       <CardContent>
         {reviews.length === 0 ? (
           <p className="text-muted-foreground text-center py-8">
             No reviews yet. Be the first to review this doctor!
           </p>
         ) : (
-          <div className="space-y-4">
+          <StaggerContainer className="space-y-4">
             {reviews.map((review) => (
-              <div
-                key={review.id}
-                className="border-b last:border-0 pb-4 last:pb-0"
-              >
-                <div className="flex items-start gap-3">
-                  <Avatar className="h-10 w-10">
-                    {review.patient?.profilePhoto ? (
-                      <AvatarImage
-                        src={review.patient.profilePhoto}
-                        alt={review.patient.name}
-                      />
-                    ) : (
-                      <AvatarFallback>
-                        <User className="h-5 w-5" />
-                      </AvatarFallback>
-                    )}
-                  </Avatar>
-                  <div className="flex-1 space-y-2">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="font-medium">
-                          {review.patient?.name || "Anonymous"}
-                        </p>
-                        <div className="flex items-center gap-1 mt-1">
-                          {renderStars(review.rating)}
+              <StaggerItem key={review.id}>
+                <div className="border-b last:border-0 pb-4 last:pb-0">
+                  <div className="flex items-start gap-3">
+                    <Avatar className="h-10 w-10">
+                      {review.patient?.profilePhoto ? (
+                        <AvatarImage
+                          src={review.patient.profilePhoto}
+                          alt={review.patient.name}
+                        />
+                      ) : (
+                        <AvatarFallback>
+                          <User className="h-5 w-5" />
+                        </AvatarFallback>
+                      )}
+                    </Avatar>
+                    <div className="flex-1 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-medium">
+                            {review.patient?.name || "Anonymous"}
+                          </p>
+                          <div className="flex items-center gap-1 mt-1">
+                            {renderStars(review.rating)}
+                          </div>
                         </div>
+                        <span className="text-sm text-muted-foreground">
+                          {format(new Date(review.createdAt), "MMM d, yyyy")}
+                        </span>
                       </div>
-                      <span className="text-sm text-muted-foreground">
-                        {format(new Date(review.createdAt), "MMM d, yyyy")}
-                      </span>
+                      <p className="text-sm text-gray-700">{review.comment}</p>
                     </div>
-                    <p className="text-sm text-gray-700">{review.comment}</p>
                   </div>
                 </div>
-              </div>
+              </StaggerItem>
             ))}
-          </div>
+          </StaggerContainer>
         )}
       </CardContent>
     </Card>

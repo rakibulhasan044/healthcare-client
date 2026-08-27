@@ -46,7 +46,7 @@ export const getUserInfo = async (): Promise<UserInfo | any> => {
 
     const result = await response.json();
 
-    if (result.success) {
+    if (result.success && result.data) {
       const accessToken = await getCookie("accessToken");
 
       if (!accessToken) {
@@ -59,22 +59,21 @@ export const getUserInfo = async (): Promise<UserInfo | any> => {
       ) as JwtPayload;
 
       userInfo = {
-        name: verifiedToken.name || "Unknown User",
-        email: verifiedToken.email,
-        role: verifiedToken.role,
+        name:
+          result.data.admin?.name ||
+          result.data.doctor?.name ||
+          result.data.patient?.name ||
+          result.data.name ||
+          verifiedToken.name ||
+          "Unknown User",
+        ...result.data,
+        role: verifiedToken.role || result.data.role,
+        email: verifiedToken.email || result.data.email,
       };
+      return userInfo;
     }
-
-    userInfo = {
-      name:
-        result.data.admin?.name ||
-        result.data.doctor?.name ||
-        result.data.patient?.name ||
-        result.data.name ||
-        "Unknown User",
-      ...result.data,
-    };
-    return userInfo;
+    
+    return null;
   } catch (error: any) {
     console.log(error);
     return {

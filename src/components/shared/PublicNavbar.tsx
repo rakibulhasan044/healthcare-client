@@ -3,7 +3,8 @@ import { Button } from "../ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "../ui/sheet";
 import { Menu } from "lucide-react";
 import { getCookie } from "@/services/auth/tokenHandler";
-import LogoutButton from "./LogoutButton";
+import { getUserInfo } from "@/services/auth/getUserInfo";
+import UserDropDown from "../modules/Dashboard/UserDropDown";
 
 const PublicNavbar = async () => {
   const navItems = [
@@ -16,8 +17,12 @@ const PublicNavbar = async () => {
   ];
 
   const accessToken = await getCookie("accessToken");
-
   const isLoggedIn = accessToken ? true : false;
+  let userInfo = null;
+  
+  if (isLoggedIn) {
+    userInfo = await getUserInfo();
+  }
 
   return (
     <header className="sticky top-0 z-50 w-full border-b backdrop-blur dark:bg-background bg-background/95 px-4">
@@ -27,7 +32,7 @@ const PublicNavbar = async () => {
             href="/"
             className="flex items-center justify-center text-xl font-bold text-primary"
           >
-            HC DOC
+            BookMyDoc
           </Link>
         </div>
         <nav className="hidden md:block">
@@ -40,8 +45,8 @@ const PublicNavbar = async () => {
           </ul>
         </nav>
         <div className="hidden md:block">
-          {isLoggedIn ? (
-            <LogoutButton />
+          {isLoggedIn && userInfo ? (
+            <UserDropDown userInfo={userInfo} />
           ) : (
             <Link href="/login">
               <Button>Login</Button>
@@ -64,9 +69,9 @@ const PublicNavbar = async () => {
                       <Link href={item.href}>{item.name}</Link>
                     </li>
                   ))}
-                  {isLoggedIn ? (
-                    <div className="div">
-                      <LogoutButton  />
+                  {isLoggedIn && userInfo ? (
+                    <div className="pt-4 border-t">
+                      <UserDropDown userInfo={userInfo} />
                     </div>
                   ) : (
                     <Link href="/login">

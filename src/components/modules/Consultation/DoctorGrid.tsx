@@ -1,5 +1,7 @@
+"use client";
 import { IDoctor } from "@/types/doctor.interface";
 import DoctorCard from "./DoctorCard";
+import { StaggerContainer, StaggerItem } from "@/components/shared/Animations";
 
 interface DoctorGridProps {
   doctors: IDoctor[];
@@ -21,10 +23,12 @@ export const DoctorGrid = ({ doctors }: DoctorGridProps) => {
     );
   }
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {doctors.map((doctor) => (
-        <DoctorCard key={doctor.id} doctor={doctor} />
+        <StaggerItem key={doctor.id}>
+          <DoctorCard doctor={doctor} />
+        </StaggerItem>
       ))}
-    </div>
+    </StaggerContainer>
   );
 };

@@ -6,14 +6,15 @@ export async function getDoctorOwnSchedules(queryString?: string) {
   try {
     const response = await serverFetch.get(
       `/doctor-schedule/my-schedule${queryString ? `?${queryString}` : ""}`,
+      { cache: "no-store" }
     );
 
     const result = await response.json();
     // return result;
     return {
       success: result.success,
-      data: Array.isArray(result.data) ? result.data.data: [],
-      meta: result.meta,
+      data: Array.isArray(result.data) ? result.data : result.data?.data || [],
+      meta: result.meta || result.data?.meta,
     };
   } catch (error: any) {
     console.log(error);
@@ -27,7 +28,9 @@ export async function getDoctorOwnSchedules(queryString?: string) {
 
 export async function getAvailableSchedules() {
   try {
-    const response = await serverFetch.get("/schedule");
+    const response = await serverFetch.get("/schedule", {
+      cache: "no-store",
+    });
     const result = await response.json();
     return result;
   } catch (error: any) {

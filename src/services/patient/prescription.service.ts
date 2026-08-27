@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { serverFetch } from "@/lib/server-fetch";
 import { IPrescriptionFormData } from "@/types/prescription.interface";
+import { revalidatePath } from "next/cache";
 
 export async function createPrescription(data: IPrescriptionFormData) {
   try {
@@ -13,6 +14,11 @@ export async function createPrescription(data: IPrescriptionFormData) {
     });
 
     const result = await response.json();
+    if (result.success) {
+      revalidatePath("/doctor/dashboard/appointments");
+      revalidatePath("/doctor/dashboard/prescriptions");
+      revalidatePath("/dashboard/my-prescriptions");
+    }
     return result;
   } catch (error: any) {
     console.error("Error creating prescription:", error);
@@ -30,6 +36,7 @@ export async function getMyPrescriptions(queryString?: string) {
   try {
     const response = await serverFetch.get(
       `/prescription/my-prescription${queryString ? `?${queryString}` : ""}`,
+      { cache: "no-store" }
     );
     const result = await response.json();
     return result;

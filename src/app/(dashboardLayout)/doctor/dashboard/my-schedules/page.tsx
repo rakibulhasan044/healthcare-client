@@ -25,14 +25,20 @@ const DoctorMySchedulesPage = async ({
   const myDoctorsScheduleResponse = await getDoctorOwnSchedules(queryString);
   const availableSchedulesResponse = await getAvailableSchedules();
 
-  const schedules = myDoctorsScheduleResponse?.data.data || [];
-  const meta = myDoctorsScheduleResponse?.data.meta;
+  const schedules = Array.isArray(myDoctorsScheduleResponse?.data)
+    ? myDoctorsScheduleResponse.data
+    : myDoctorsScheduleResponse?.data?.data || [];
+  const meta = myDoctorsScheduleResponse?.meta || myDoctorsScheduleResponse?.data?.meta;
   const totalPages = Math.ceil((meta?.total || 1) / (meta?.limit || 1));
+
+  const availableSchedules = Array.isArray(availableSchedulesResponse?.data)
+    ? availableSchedulesResponse.data
+    : availableSchedulesResponse?.data?.data || [];
 
   return (
     <div className="space-y-6">
       <MySchedulesHeader
-        availableSchedules={availableSchedulesResponse.data.data || []}
+        availableSchedules={availableSchedules}
       />
       <MySchedulesFilters />
       <Suspense fallback={<TableSkeleton columns={5} rows={10} />}>

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import AppointmentConfirmation from "@/components/modules/Patient/PatientAppointment/AppointmentConfirmation";
 import { getDoctorById } from "@/services/admin/doctorManagement";
 import { IDoctor } from "@/types/doctor.interface";
@@ -29,7 +30,12 @@ export default async function BookAppointmentPage({
     (ds: any) => ds.scheduleId === scheduleId
   );
 
+  console.log("Looking for scheduleId:", scheduleId);
+  console.log("doctorSchedules:", doctor.doctorSchedules);
+  console.log("found doctorSchedule:", doctorSchedule);
+
   if (!doctorSchedule || !doctorSchedule.schedule) {
+    console.log("Triggering notFound because schedule wasn't found in doctorSchedules");
     notFound();
   }
 

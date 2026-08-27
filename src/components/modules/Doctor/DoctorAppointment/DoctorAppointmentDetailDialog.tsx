@@ -40,8 +40,9 @@ export default function DoctorAppointmentDetailDialog({
     appointment;
 
   const isCompleted = status === "COMPLETED";
+  const isPaid = paymentStatus === "PAID";
   const hasPrescription = !!prescription;
-  const canWritePrescription = isCompleted && !hasPrescription;
+  const canWritePrescription = isCompleted && isPaid && !hasPrescription;
 
   const handleSubmitPrescription = async () => {
     if (!instructions.trim()) {
@@ -212,6 +213,15 @@ export default function DoctorAppointmentDetailDialog({
                     COMPLETED
                   </span>
                   .
+                </p>
+              </div>
+            )}
+
+            {isCompleted && !isPaid && !hasPrescription && (
+              <div className="bg-red-50 text-red-700 p-4 rounded-md border border-red-200">
+                <p className="font-medium text-sm">
+                  ⚠️ This appointment is completed but the payment is still pending. 
+                  You can only write a prescription once the patient completes the payment.
                 </p>
               </div>
             )}

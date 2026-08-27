@@ -42,7 +42,7 @@ export default function BookAppointmentDialog({
     const grouped: Record<string, IDoctorSchedule[]> = {};
 
     doctorSchedules.forEach((schedule) => {
-      if (!schedule.schedule?.startDateTime) return;
+      if (!schedule.schedule?.startDateTime || schedule.isBooked) return;
 
       const startDate = new Date(schedule.schedule.startDateTime)
         .toISOString()

@@ -5,7 +5,7 @@ import { AppointmentStatus, IAppointment } from "@/types/appointment.interface";
 import { format } from "date-fns";
 
 const statusConfig: Record<
-  AppointmentStatus,
+  string,
   { variant: any; label: string; className?: string }
 > = {
   [AppointmentStatus.SCHEDULED]: {
@@ -13,7 +13,16 @@ const statusConfig: Record<
     label: "Scheduled",
     className: "bg-blue-500 hover:bg-blue-600",
   },
+  "SCHEDULE": {
+    variant: "default",
+    label: "Scheduled",
+    className: "bg-blue-500 hover:bg-blue-600",
+  },
   [AppointmentStatus.INPROGRESS]: {
+    variant: "secondary",
+    label: "In Progress",
+  },
+  "IN_PROGRESS": {
     variant: "secondary",
     label: "In Progress",
   },

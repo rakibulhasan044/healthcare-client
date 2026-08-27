@@ -1,5 +1,6 @@
 import DashboardNavbar from "@/components/modules/Dashboard/DashboardNavbar";
 import DashboardSidebar from "@/components/modules/Dashboard/DashboardSidebar";
+import { PageTransition } from "@/components/shared/Animations";
 
 const CommonDashboardLayout = async ({
   children,
@@ -12,7 +13,7 @@ const CommonDashboardLayout = async ({
       <div className="flex flex-1 flex-col overflow-hidden">
         <DashboardNavbar />
         <main className="flex-1 overflow-y-auto bg-muted/10 p-4 md:p-6">
-          <div className="">{children}</div>
+          <PageTransition>{children}</PageTransition>
         </main>
       </div>
     </div>

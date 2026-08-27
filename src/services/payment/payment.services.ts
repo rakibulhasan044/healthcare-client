@@ -6,7 +6,7 @@ import { serverFetch } from "@/lib/server-fetch";
 export async function initiatePayment(appointmentId: string) {
   try {
     const response = await serverFetch.post(
-      `/appointment/${appointmentId}/initiate-payment`,
+      `/appointment/initiate-payment/${appointmentId}`,
       {
         headers: {
           "Content-Type": "application/json",

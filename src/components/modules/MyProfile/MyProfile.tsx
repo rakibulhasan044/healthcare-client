@@ -10,6 +10,7 @@ import { UserInfo } from "@/types/user.interface";
 import { Camera, Loader2, Save } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
+import { FadeUp, ScaleIn } from "@/components/shared/Animations";
 
 interface IMyProfileProps {
   userInfo: UserInfo;
@@ -18,6 +19,7 @@ const MyProfile = ({ userInfo }: IMyProfileProps) => {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [resizedFile, setResizedFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
@@ -51,7 +53,52 @@ const MyProfile = ({ userInfo }: IMyProfileProps) => {
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setPreviewImage(reader.result as string);
+        const img = new Image();
+        img.src = reader.result as string;
+        img.onload = () => {
+          // Check if file is > 1MB
+          if (file.size > 1024 * 1024) {
+            const canvas = document.createElement("canvas");
+            const MAX_WIDTH = 800;
+            const MAX_HEIGHT = 800;
+            let width = img.width;
+            let height = img.height;
+
+            if (width > height) {
+              if (width > MAX_WIDTH) {
+                height *= MAX_WIDTH / width;
+                width = MAX_WIDTH;
+              }
+            } else {
+              if (height > MAX_HEIGHT) {
+                width *= MAX_HEIGHT / height;
+                height = MAX_HEIGHT;
+              }
+            }
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext("2d");
+            ctx?.drawImage(img, 0, 0, width, height);
+
+            canvas.toBlob(
+              (blob) => {
+                if (blob) {
+                  const newFile = new File([blob], file.name, {
+                    type: "image/jpeg",
+                    lastModified: Date.now(),
+                  });
+                  setResizedFile(newFile);
+                  setPreviewImage(URL.createObjectURL(blob));
+                }
+              },
+              "image/jpeg",
+              0.8
+            );
+          } else {
+            setResizedFile(file);
+            setPreviewImage(reader.result as string);
+          }
+        };
       };
       reader.readAsDataURL(file);
     }
@@ -65,6 +112,11 @@ const MyProfile = ({ userInfo }: IMyProfileProps) => {
     setSuccess(null);
 
     const formData = new FormData(e.currentTarget);
+    
+    // Override file with resized version if available
+    if (resizedFile) {
+      formData.set("file", resizedFile);
+    }
 
     startTransition(async () => {
       const result = await updateMyProfile(formData);
@@ -80,7 +132,7 @@ const MyProfile = ({ userInfo }: IMyProfileProps) => {
   };
 
   return (
-    <div className="space-y-6">
+    <FadeUp className="space-y-6">
       {/* Page Header */}
       <div>
         <h1 className="text-3xl font-bold">My Profile</h1>
@@ -91,52 +143,54 @@ const MyProfile = ({ userInfo }: IMyProfileProps) => {
 
       <form onSubmit={handleSubmit}>
         <div className="grid gap-6 lg:grid-cols-3">
-          <Card className="lg:col-span-1">
-            <CardHeader>
-              <CardTitle>Profile Picture</CardTitle>
-            </CardHeader>
-            <CardContent className="flex flex-col items-center space-y-4">
-              <div className="relative">
-                <Avatar className="h-32 w-32">
-                  {previewImage || profilePhoto ? (
-                    <AvatarImage
-                      src={previewImage || (profilePhoto as string)}
-                      alt={userInfo.name}
+          <ScaleIn className="lg:col-span-1">
+            <Card>
+              <CardHeader>
+                <CardTitle>Profile Picture</CardTitle>
+              </CardHeader>
+              <CardContent className="flex flex-col items-center space-y-4">
+                <div className="relative">
+                  <Avatar className="h-32 w-32">
+                    {previewImage || profilePhoto ? (
+                      <AvatarImage
+                        src={previewImage || (profilePhoto as string)}
+                        alt={userInfo.name}
+                      />
+                    ) : (
+                      <AvatarFallback className="text-3xl">
+                        {getInitials(userInfo.name)}
+                      </AvatarFallback>
+                    )}
+                  </Avatar>
+                  <label
+                    htmlFor="file"
+                    className="absolute bottom-0 right-0 bg-primary text-primary-foreground rounded-full p-2 cursor-pointer hover:bg-primary/90 transition-colors"
+                  >
+                    <Camera className="h-4 w-4" />
+                    <Input
+                      type="file"
+                      id="file"
+                      name="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleImageChange}
+                      disabled={isPending}
                     />
-                  ) : (
-                    <AvatarFallback className="text-3xl">
-                      {getInitials(userInfo.name)}
-                    </AvatarFallback>
-                  )}
-                </Avatar>
-                <label
-                  htmlFor="file"
-                  className="absolute bottom-0 right-0 bg-primary text-primary-foreground rounded-full p-2 cursor-pointer hover:bg-primary/90 transition-colors"
-                >
-                  <Camera className="h-4 w-4" />
-                  <Input
-                    type="file"
-                    id="file"
-                    name="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={handleImageChange}
-                    disabled={isPending}
-                  />
-                </label>
-              </div>
+                  </label>
+                </div>
 
-              <div className="text-center">
-                <p className="font-semibold text-lg">{userInfo.name}</p>
-                <p className="text-sm text-muted-foreground">
-                  {userInfo.email}
-                </p>
-                <p className="text-xs text-muted-foreground mt-1 capitalize">
-                  {userInfo.role.replace("_", " ")}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+                <div className="text-center">
+                  <p className="font-semibold text-lg">{userInfo.name}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {userInfo.email}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1 capitalize">
+                    {userInfo.role.replace("_", " ")}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </ScaleIn>
           {/* Profile Information Card */}
           <Card className="lg:col-span-2">
             <CardHeader>
@@ -316,7 +370,7 @@ const MyProfile = ({ userInfo }: IMyProfileProps) => {
           </Card>
         </div>
       </form>
-    </div>
+    </FadeUp>
   );
 };
 

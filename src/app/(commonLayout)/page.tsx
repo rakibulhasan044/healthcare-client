@@ -7,7 +7,7 @@ import Testimonials from "@/components/modules/Home/Testimonials";
 import TopRatedDoctors from "@/components/modules/Home/TopRatedDoctor";
 
 export const metadata: Metadata = {
-  title: "AI-Powered Healthcare - Find Your Perfect Doctor",
+  title: "BookMyDoc - Find Your Perfect Doctor",
   description:
     "Discover top-rated doctors tailored to your needs with an AI-powered healthcare platform",
   icons: {

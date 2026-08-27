@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Search,
   ClipboardList,
@@ -10,6 +12,12 @@ import {
 } from "lucide-react";
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
+import {
+  FadeUp,
+  StaggerContainer,
+  StaggerItem,
+  HoverCard,
+} from "@/components/shared/Animations";
 
 const steps = [
   {
@@ -87,21 +95,25 @@ const StepCard = ({
   ];
 
   return (
-    <Card className={`${bgColors[index % 8]}`}>
-      <CardContent className="p-4">
-        <div className="flex items-center space-x-4">
-          <div
-            className={`p-3 rounded-full ${textColors[index % 8]} bg-white shadow-sm`}
-          >
-            <Icon size={24} />
-          </div>
-          <div>
-            <h3 className="font-bold text-foreground">{title}</h3>
-            <p className="text-muted-foreground text-sm">{description}</p>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+    <StaggerItem>
+      <HoverCard>
+        <Card className={`${bgColors[index % 8]}`}>
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-4">
+              <div
+                className={`p-3 rounded-full ${textColors[index % 8]} bg-white shadow-sm`}
+              >
+                <Icon size={24} />
+              </div>
+              <div>
+                <h3 className="font-bold text-foreground">{title}</h3>
+                <p className="text-muted-foreground text-sm">{description}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </HoverCard>
+    </StaggerItem>
   );
 };
 
@@ -109,21 +121,23 @@ const Steps = () => {
   return (
     <section className="py-24">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-2xl mx-auto">
-          <h2 className="text-3xl font-bold text-foreground">
-            Easy Steps to Get Your Solution
-          </h2>
-          <p className="text-muted-foreground mt-4">
-            We provide advanced technologies and high-quality surgery facilities
-            right here.
-          </p>
-        </div>
+        <FadeUp>
+          <div className="text-center max-w-2xl mx-auto">
+            <h2 className="text-3xl font-bold text-foreground">
+              Easy Steps to Get Your Solution
+            </h2>
+            <p className="text-muted-foreground mt-4">
+              We provide advanced technologies and high-quality surgery
+              facilities right here.
+            </p>
+          </div>
+        </FadeUp>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-12">
+        <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-12">
           {steps.map((step, index) => (
             <StepCard key={index} {...step} index={index} />
           ))}
-        </div>
+        </StaggerContainer>
       </div>
     </section>
   );

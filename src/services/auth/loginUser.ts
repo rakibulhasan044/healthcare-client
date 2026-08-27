@@ -47,6 +47,13 @@ export const loginUser = async (
 
     const result = await res.json();
 
+    if (!result.success) {
+      return {
+        success: false,
+        message: result.message || "Invalid email or password",
+      };
+    }
+
     const setCookieHeaders = res.headers.getSetCookie();
 
     if (setCookieHeaders && setCookieHeaders.length > 0) {
@@ -65,11 +72,11 @@ export const loginUser = async (
     }
 
     if (!accessTokenObject) {
-      throw new Error("Tokens not found in cookies");
+      throw new Error("Access token not found in cookies");
     }
 
     if (!refreshTokenObject) {
-      throw new Error("Tokens not found in cookies");
+      throw new Error("Refresh token not found in cookies");
     }
 
     await setCookie("accessToken", accessTokenObject.accessToken, {
@@ -98,10 +105,6 @@ export const loginUser = async (
     }
 
     const userRole: UserRole = verifiedToken.role;
-
-    if (!result.success) {
-      throw new Error(result.message || "Login failed");
-    }
 
     if (redirectTo && result.data.needPasswordChange) {
       const requestedPath = redirectTo.toString();

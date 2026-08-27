@@ -121,7 +121,9 @@ export async function getDoctors(queryString?: string) {
 
 export async function getDoctorById(id: string) {
   try {
-    const response = await serverFetch.get(`/doctor/${id}`);
+    const response = await serverFetch.get(`/doctor/${id}`, {
+      cache: "no-store",
+    });
     const result = await response.json();
     return result;
   } catch (error: any) {

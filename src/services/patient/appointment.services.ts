@@ -2,11 +2,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { serverFetch } from "@/lib/server-fetch";
 import { IAppointmentFormData } from "@/types/appointment.interface";
-import { revalidateTag } from "next/cache";
+import { revalidateTag, revalidatePath } from "next/cache";
 
 export async function createAppointment(data: IAppointmentFormData) {
   try {
-    const response = await serverFetch.post("/appointment", {
+    const response = await serverFetch.post("/appointment/book-appointment", {
       body: JSON.stringify(data),
       headers: {
         "Content-Type": "application/json",
@@ -14,6 +14,12 @@ export async function createAppointment(data: IAppointmentFormData) {
     });
 
     const result = await response.json();
+
+    if (result.success) {
+      revalidatePath("/consultation");
+      revalidatePath(`/consultation/doctor/${data.doctorId}`);
+    }
+
     return result;
   } catch (error: any) {
     console.error("Error creating appointment:", error);
@@ -31,20 +37,26 @@ export async function createAppointmentWithPayLater(
   data: IAppointmentFormData,
 ) {
   try {
-    const response = await serverFetch.post("/appointment/pay-later", {
-      body: JSON.stringify(data),
-      headers: {
-        "Content-Type": "application/json",
+    const response = await serverFetch.post(
+      "/appointment/book-appointment-with-pay-later",
+      {
+        body: JSON.stringify(data),
+        headers: {
+          "Content-Type": "application/json",
+        },
       },
-    });
+    );
 
     const result = await response.json();
     if (result.success) {
-      revalidateTag("my-appointments", { expire: 0 });
-      revalidateTag("appointments-list", { expire: 0 });
-      revalidateTag("patient-dashboard-meta", { expire: 0 });
-      revalidateTag("admin-dashboard-meta", { expire: 0 });
-      revalidateTag("doctor-dashboard-meta", { expire: 0 });
+      revalidateTag("my-appointments");
+      revalidateTag("appointments-list");
+      revalidateTag("patient-dashboard-meta");
+      revalidateTag("admin-dashboard-meta");
+      revalidateTag("doctor-dashboard-meta");
+
+      revalidatePath("/consultation");
+      revalidatePath(`/consultation/doctor/${data.doctorId}`);
     }
 
     return result;
@@ -87,8 +99,12 @@ export async function getAppointmentById(appointmentId: string) {
     const result = await response.json();
 
     if (result.success && result.data) {
+      const appointmentList = Array.isArray(result.data)
+        ? result.data
+        : result.data.data || [];
+
       // Find the appointment by ID from the list
-      const appointment = result.data.find(
+      const appointment = appointmentList.find(
         (apt: any) => apt.id === appointmentId,
       );
 

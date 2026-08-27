@@ -71,10 +71,10 @@ export const appointmentsColumns: Column<IAppointment>[] = [
     accessor: (appointment) => {
       const status = appointment.status;
 
-      if (status === AppointmentStatus.SCHEDULED) {
+      if (status === AppointmentStatus.SCHEDULED || status === "SCHEDULE" as any) {
         return <Badge variant="default">Scheduled</Badge>;
       }
-      if (status === AppointmentStatus.INPROGRESS) {
+      if (status === AppointmentStatus.INPROGRESS || status === "IN_PROGRESS" as any) {
         return <Badge variant="secondary">In Progress</Badge>;
       }
       if (status === AppointmentStatus.COMPLETED) {

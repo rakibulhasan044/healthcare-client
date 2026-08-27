@@ -3,6 +3,7 @@
 import { LucideIcon, Plus } from "lucide-react";
 import React from "react";
 import { Button } from "../ui/button";
+import { FadeLeft, FadeRight } from "@/components/shared/Animations";
 
 interface ManagementPageHeaderProps {
   title: string;
@@ -23,19 +24,26 @@ const ManagementPageHeader = ({
   const Icon = action?.icon || Plus;
   return (
     <div className="flex items-center justify-between">
-      <div>
-        <h1 className="text-3xl font-bold">{title}</h1>
-        {description && (
-          <p className="text-muted-foreground mt-1">{description}</p>
-        )}
-      </div>
-      {action && (
-        <Button onClick={action.onClick}>
-          <Icon className="mr-2 h-4 w-4" />
-          {action.label}
-        </Button>
-      )}
-      {children}
+      <FadeLeft>
+        <div>
+          <h1 className="text-3xl font-bold">{title}</h1>
+          {description && (
+            <p className="text-muted-foreground mt-1">{description}</p>
+          )}
+        </div>
+      </FadeLeft>
+      
+      <FadeRight>
+        <div className="flex items-center gap-2">
+          {action && (
+            <Button onClick={action.onClick}>
+              <Icon className="mr-2 h-4 w-4" />
+              {action.label}
+            </Button>
+          )}
+          {children}
+        </div>
+      </FadeRight>
     </div>
   );
 };

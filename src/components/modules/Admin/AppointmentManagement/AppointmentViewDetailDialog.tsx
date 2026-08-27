@@ -33,10 +33,10 @@ const AppointmentViewDetailDialog = ({
   if (!appointment) return null;
 
   const getStatusBadge = () => {
-    if (appointment.status === AppointmentStatus.SCHEDULED) {
+    if (appointment.status === AppointmentStatus.SCHEDULED || appointment.status === "SCHEDULE" as any) {
       return <Badge variant="default">Scheduled</Badge>;
     }
-    if (appointment.status === AppointmentStatus.INPROGRESS) {
+    if (appointment.status === AppointmentStatus.INPROGRESS || appointment.status === "IN_PROGRESS" as any) {
       return <Badge variant="secondary">In Progress</Badge>;
     }
     if (appointment.status === AppointmentStatus.COMPLETED) {
