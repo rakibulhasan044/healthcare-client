@@ -49,15 +49,15 @@ export async function createAppointmentWithPayLater(
 
     const result = await response.json();
     if (result.success) {
-      // @ts-ignore
+      // @ts-expect-error ts bug
       revalidateTag("my-appointments");
-      // @ts-ignore
+      // @ts-expect-error ts bug
       revalidateTag("appointments-list");
-      // @ts-ignore
+      // @ts-expect-error ts bug
       revalidateTag("patient-dashboard-meta");
-      // @ts-ignore
+      // @ts-expect-error ts bug
       revalidateTag("admin-dashboard-meta");
-      // @ts-ignore
+      // @ts-expect-error ts bug
       revalidateTag("doctor-dashboard-meta");
 
       revalidatePath("/consultation");
