@@ -1,36 +1,53 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# BookMyDoc - Healthcare Client (Frontend)
 
-## Getting Started
+BookMyDoc is a modern, full-stack healthcare appointment booking platform. This frontend application provides an intuitive, animated, and responsive user interface for patients, doctors, and administrators.
 
-First, run the development server:
+## ✨ Features
+- **Role-Based Access Control (RBAC):** Dedicated dashboards for `SUPER_ADMIN`, `ADMIN`, `DOCTOR`, and `PATIENT`.
+- **Modern Tech Stack:** Built with **Next.js 16 (App Router)** and **React 19**.
+- **Beautiful UI:** Styled with **Tailwind CSS**, **shadcn/ui**, and animated using **Framer Motion**.
+- **Secure Authentication:** JWT-based authentication using HTTP-only cookies and edge-compatible decoding.
+- **Appointment Booking:** Patients can seamlessly find doctors and book schedules.
+- **Form Validation:** Robust client-side validation using **Zod**.
 
+## 🚀 Tech Stack
+- **Framework:** Next.js 16 (App Router)
+- **UI Library:** React 19
+- **Styling:** Tailwind CSS + shadcn/ui
+- **Animations:** Framer Motion
+- **Auth Handling:** jwt-decode + set-cookie-parser
+
+## 🛠️ Local Setup Instructions
+
+### 1. Clone the repository
+Ensure you are in the `healthcare-client` directory.
+
+### 2. Install Dependencies
+Run the following command to install all required packages:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 3. Environment Variables
+Create a `.env` file in the root directory and add the following variables:
+```env
+NODE_ENV=development
+NEXT_PUBLIC_BASE_API_URL="http://localhost:4000/api/v1"
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+# These secrets MUST match the backend exactly for JWT verification to work!
+JWT_SECRET="your_backend_jwt_secret"
+EXPIRES_IN="15d"
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+REFRESH_TOKEN_SECRET="your_backend_refresh_token_secret"
+REFRESH_TOKEN_EXPIRES_IN="30d"
+```
 
-## Learn More
+### 4. Run the Development Server
+Start the Next.js development server:
+```bash
+npm run dev
+```
+The application will be running at [http://localhost:3000](http://localhost:3000).
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🌍 Deployment
+This application is fully optimized for **Vercel** deployment. Ensure your environment variables are added to the Vercel dashboard prior to building.

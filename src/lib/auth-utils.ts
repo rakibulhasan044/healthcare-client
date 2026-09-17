@@ -1,4 +1,4 @@
-export type UserRole = "ADMIN" | "DOCTOR" | "PATIENT";
+export type UserRole = "ADMIN" | "DOCTOR" | "PATIENT" | "SUPER_ADMIN";
 
 export type RouteConfig = {
   exact: string[];
@@ -62,7 +62,7 @@ export const getRouteOwner = (
 };
 
 export const getDefaultDashboardRoute = (role: string): string => {
-  if (role === "ADMIN") {
+  if (role === "ADMIN" || role === "SUPER_ADMIN") {
     return "/admin/dashboard";
   }
   if (role === "DOCTOR") {
@@ -84,6 +84,9 @@ export const isValidRedirectForRole = (
     return true;
   }
   if (routeOwner === role) {
+    return true;
+  }
+  if (routeOwner === "ADMIN" && role === "SUPER_ADMIN") {
     return true;
   }
 

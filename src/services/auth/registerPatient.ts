@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
 
+import { redirect } from "next/navigation";
 import { loginUser } from "./loginUser";
 import { serverFetch } from "../../lib/server-fetch";
 import { zodValidatorSchema } from "../../lib/zodvalidator";
@@ -56,7 +57,7 @@ export const registerPatient = async (
     const result = await res.json();
 
     if (result.success) {
-      return await loginUser(_currentState, formData);
+      redirect("/login?registered=true");
     }
     return result;
   } catch (error: any) {

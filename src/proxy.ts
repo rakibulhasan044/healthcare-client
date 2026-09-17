@@ -117,6 +117,11 @@ export async function proxy(request: NextRequest) {
     routerOwner === "DOCTOR" ||
     routerOwner === "PATIENT"
   ) {
+    // SUPER_ADMIN can access ADMIN routes
+    if (routerOwner === "ADMIN" && userRole === "SUPER_ADMIN") {
+      return NextResponse.next();
+    }
+
     if (userRole !== routerOwner) {
       return NextResponse.redirect(
         new URL(getDefaultDashboardRoute(userRole as UserRole), request.url),
